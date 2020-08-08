@@ -12,7 +12,8 @@ const directions = {
 const itemType = {
   PLAYER: "player",
   WALL: "wall",
-  DOT: "dot"
+  DOT: "dot",
+  NONE: "none"
 };
 
 function createMaze() {
@@ -55,15 +56,17 @@ export default function App() {
   useKeyPress("ArrowLeft", () => setDirection(directions.LEFT));
   useKeyPress("ArrowRight", () => setDirection(directions.RIGHT));
 
-  useInterval(() => {
-    //TODO Deze if kan weg als de interval milliseconden stateful wordt
-    if (direction === directions.IDLE || gameOver) return;
+  // useInterval(() => {
+  //   //TODO Deze if kan weg als de interval milliseconden stateful wordt
+  //   if (direction === directions.IDLE || gameOver) return;
 
-    move(direction);
-  }, 400);
+  //   move(direction);
+  // }, 400);
 
   function move(direction) {
     const updatedMaze = movePlayer(maze, direction);
+
+    console.log(updatedMaze);
 
     //TODO Deze if is een niet heel belangrijke optimalisatie, maar goed.
     //Als ik het goed heb begrepen doe je met deze if een shallow comparison,
@@ -73,18 +76,23 @@ export default function App() {
     if (updatedMaze !== maze) setMaze(updatedMaze);
   }
 
+  function changeDirection(direction) {
+    //    setDirection(direction);
+    move(direction);
+  }
+
   return (
-    <div className="App">
+    <div style={{ textAlign: "center" }}>
       <h1>My Game</h1>
 
       <svg width={maze.width} height={maze.height}>
         <rect width={maze.width} height={maze.height} fill="black" />
         {maze.items.map((item) => (
-          <>
-            <Item key={item.id} item={item} />
-          </>
+          <Item key={item.id} item={item} />
         ))}
       </svg>
+
+      <Buttons buttonClicked={changeDirection} disabled={gameOver} />
     </div>
   );
 }
@@ -163,14 +171,22 @@ function useInterval(callback, delay) {
 function movePlayer(maze, direction) {
   const newIndex = determineNewIndex(maze.player, maze.columns, direction);
 
-  // Check the player does not go outside the maze.
+  // Do nothing if the player goes outside the maze.
   if (newIndex < 0 || newIndex > maze.items.length - 1) return maze;
 
-  // Check the player does not walk into a wall.
-  //...
+  // Do nothing if the player walks into a wall.
+  if (maze.items[newIndex].type === itemType.WALL) return maze;
+
+  // Do nothing if the player had already reached the exit.
+  if (maze.player === maze.exit) return maze;
 
   // Everything's fine, update the new player position in the maze.
-  const updatedMaze = { ...maze };
+  const updatedMaze = { ...maze, player: newIndex };
+
+  updatedMaze.items[maze.player].type = itemType.NONE;
+  updatedMaze.items[newIndex].type = itemType.PLAYER;
+
+  return updatedMaze;
 }
 
 function determineNewIndex(currentIndex, columns, direction) {
@@ -186,4 +202,46 @@ function determineNewIndex(currentIndex, columns, direction) {
     default:
       return -1;
   }
+}
+
+function Buttons({ buttonClicked, disabled }) {
+  return (
+    <div>
+      <div>
+        <button
+          onClick={() => buttonClicked(directions.UP)}
+          disabled={disabled}
+          className="arrowButton"
+        >
+          <i className="arrow up"></i>
+        </button>
+      </div>
+      <div>
+        <button
+          onClick={() => buttonClicked(directions.LEFT)}
+          style={{ marginRight: "60px" }}
+          disabled={disabled}
+          className="arrowButton"
+        >
+          <i className="arrow left"></i>
+        </button>
+        <button
+          onClick={() => buttonClicked(directions.RIGHT)}
+          disabled={disabled}
+          className="arrowButton"
+        >
+          <i className="arrow right"></i>
+        </button>
+      </div>
+      <div>
+        <button
+          onClick={() => buttonClicked(directions.DOWN)}
+          disabled={disabled}
+          className="arrowButton"
+        >
+          <i className="arrow down"></i>
+        </button>
+      </div>
+    </div>
+  );
 }
