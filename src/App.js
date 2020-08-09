@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./styles.css";
+import Modal from "./Modal";
 
 const directions = {
   IDLE: "idle",
@@ -81,9 +82,16 @@ export default function App() {
     move(direction);
   }
 
+  function resetGame() {
+    setDirection(initialState.direction);
+    setMaze(initialState.createMaze());
+  }
+
   return (
     <div style={{ textAlign: "center" }}>
       <h1>My Game</h1>
+
+      {gameOver && <GameOver resetGame={resetGame} />}
 
       <svg width={maze.width} height={maze.height}>
         <rect width={maze.width} height={maze.height} fill="black" />
@@ -243,5 +251,18 @@ function Buttons({ buttonClicked, disabled }) {
         </button>
       </div>
     </div>
+  );
+}
+
+function GameOver({ resetGame }) {
+  return (
+    <Modal>
+      <h3>YES! You made it!</h3>
+      <p>
+        <button autoFocus onClick={resetGame}>
+          Try again
+        </button>
+      </p>
+    </Modal>
   );
 }
