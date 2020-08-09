@@ -57,17 +57,15 @@ export default function App() {
   useKeyPress("ArrowLeft", () => setDirection(directions.LEFT));
   useKeyPress("ArrowRight", () => setDirection(directions.RIGHT));
 
-  // useInterval(() => {
-  //   //TODO Deze if kan weg als de interval milliseconden stateful wordt
-  //   if (direction === directions.IDLE || gameOver) return;
+  useInterval(() => {
+    //TODO Deze if kan weg als de interval milliseconden stateful wordt
+    if (direction === directions.IDLE || gameOver) return;
 
-  //   move(direction);
-  // }, 400);
+    move(direction);
+  }, 400);
 
   function move(direction) {
     const updatedMaze = movePlayer(maze, direction);
-
-    console.log(updatedMaze);
 
     //TODO Deze if is een niet heel belangrijke optimalisatie, maar goed.
     //Als ik het goed heb begrepen doe je met deze if een shallow comparison,
@@ -78,8 +76,7 @@ export default function App() {
   }
 
   function changeDirection(direction) {
-    //    setDirection(direction);
-    move(direction);
+    setDirection(direction);
   }
 
   function resetGame() {
