@@ -1,26 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "./styles.css";
 import Modal from "./Modal";
-import { useKeyPress } from "./useKeyPress";
-import { useInterval } from "./useInterval";
-
-const directions = {
-  IDLE: "idle",
-  UP: "up",
-  DOWN: "down",
-  LEFT: "left",
-  RIGHT: "right"
-};
-
-const itemType = {
-  PLAYER: "player",
-  WALL: "wall",
-  DOT: "dot",
-  FOOD: "food",
-  NONE: "none"
-};
-
-const howManyFood = 1;
+import { useKeyPress } from "../hooks/useKeyPress";
+import { useInterval } from "../hooks/useInterval";
+import { itemType, directions, movePlayer, addFood } from "../functions";
 
 function createMaze() {
   return {
