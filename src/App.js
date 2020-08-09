@@ -14,22 +14,26 @@ const itemType = {
   PLAYER: "player",
   WALL: "wall",
   DOT: "dot",
+  FOOD: "food",
   NONE: "none"
 };
+
+const howManyFood = 1;
 
 function createMaze() {
   return {
     width: 60,
     height: 80,
     columns: 3,
-    player: 1,
-    exit: 10,
+    playerIndex: 1,
+    exitIndex: 10,
+    currentFoods: 1,
     items: [
       { id: 0, x: 0, y: 0, type: itemType.WALL },
       { id: 1, x: 30, y: 10, type: itemType.PLAYER },
       { id: 2, x: 40, y: 0, type: itemType.WALL },
       { id: 3, x: 0, y: 20, type: itemType.WALL },
-      { id: 4, x: 30, y: 30, type: itemType.DOT },
+      { id: 4, x: 30, y: 30, type: itemType.FOOD },
       { id: 5, x: 40, y: 20, type: itemType.WALL },
       { id: 6, x: 0, y: 40, type: itemType.WALL },
       { id: 7, x: 30, y: 50, type: itemType.DOT },
@@ -50,7 +54,7 @@ export default function App() {
   const [maze, setMaze] = useState(initialState.createMaze);
   const [direction, setDirection] = useState(initialState.direction);
 
-  const gameOver = maze.player === maze.exit;
+  const gameOver = maze.playerIndex === maze.exitIndex;
 
   useKeyPress("ArrowUp", () => setDirection(directions.UP));
   useKeyPress("ArrowDown", () => setDirection(directions.DOWN));
@@ -63,6 +67,10 @@ export default function App() {
 
     move(direction);
   }, 400);
+
+  useEffect(() => {
+    addFood(maze);
+  }, [maze]);
 
   function move(direction) {
     const updatedMaze = movePlayer(maze, direction);
@@ -106,6 +114,7 @@ function Item({ item }) {
   if (item.type === itemType.WALL) return <Wall wall={item} />;
   if (item.type === itemType.PLAYER) return <Player player={item} />;
   if (item.type === itemType.DOT) return <Dot dot={item} />;
+  if (item.type === itemType.FOOD) return <Food food={item} />;
   else return null;
 }
 
@@ -116,7 +125,6 @@ function Player({ player }) {
 function Wall({ wall }) {
   return (
     <rect
-      key={`${wall.x}-${wall.y}`}
       width={20}
       height={20}
       x={wall.x}
@@ -131,6 +139,10 @@ function Wall({ wall }) {
 
 function Dot({ dot }) {
   return <circle key={`${dot.x}-${dot.y}`} cx={dot.x} cy={dot.y} r={2} fill="green" />;
+}
+
+function Food({ food }) {
+  return <circle cx={food.x} cy={food.y} r={7} fill="green" />;
 }
 
 function useKeyPress(targetKey, onKeyDownCallback = null, onKeyUpCallback = null) {
@@ -174,7 +186,7 @@ function useInterval(callback, delay) {
 }
 
 function movePlayer(maze, direction) {
-  const newIndex = determineNewIndex(maze.player, maze.columns, direction);
+  const newIndex = determineNewIndex(maze.playerIndex, maze.columns, direction);
 
   // Do nothing if the player goes outside the maze.
   if (newIndex < 0 || newIndex > maze.items.length - 1) return maze;
@@ -183,12 +195,12 @@ function movePlayer(maze, direction) {
   if (maze.items[newIndex].type === itemType.WALL) return maze;
 
   // Do nothing if the player had already reached the exit.
-  if (maze.player === maze.exit) return maze;
+  if (maze.playerIndex === maze.exitIndex) return maze;
 
   // Everything's fine, update the new player position in the maze.
-  const updatedMaze = { ...maze, player: newIndex };
+  const updatedMaze = { ...maze, playerIndex: newIndex };
 
-  updatedMaze.items[maze.player].type = itemType.NONE;
+  updatedMaze.items[maze.playerIndex].type = itemType.NONE;
   updatedMaze.items[newIndex].type = itemType.PLAYER;
 
   return updatedMaze;
@@ -207,6 +219,13 @@ function determineNewIndex(currentIndex, columns, direction) {
     default:
       return -1;
   }
+}
+
+function addFood(maze) {
+  if (maze.currentFoods === howManyFood) return maze;
+
+  //TODO Create random food
+  return maze;
 }
 
 function Buttons({ buttonClicked, disabled }) {
