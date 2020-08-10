@@ -31,7 +31,6 @@ export default function App() {
   }, 400);
 
   useEffect(() => {
-    console.log("ja");
     addFood(maze);
   }, [maze]);
 
