@@ -1,8 +1,8 @@
 import { itemType } from "../functions";
-import mazeTemplate from "./testmaze.js";
+//import mazeTemplate from "./testmaze.js";
 // //import mazeTemplate from "./maze1.js";
 // //import mazeTemplate from "./kpn.js";
-// import mazeTemplate from "./newnexus.js";
+import mazeTemplate from "./newnexus.js";
 
 export const defaultItemSize = 20;
 
@@ -40,6 +40,8 @@ export function createMaze() {
     y += defaultItemSize;
   });
 
+  //console.log("maze", maze);
+
   return maze;
 }
 
@@ -66,7 +68,12 @@ function createPlayer(x, y) {
 }
 
 function createExit(x, y) {
-  return createDot(x, y);
+  return {
+    x: x + defaultItemSize / 2,
+    y: y + defaultItemSize / 2,
+    size: 2,
+    type: itemType.EXIT
+  };
 }
 
 // return {
