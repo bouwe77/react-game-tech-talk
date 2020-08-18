@@ -37,12 +37,6 @@ export default function App() {
 
   function move(direction) {
     const updatedMaze = movePlayer(maze, direction, updateScore);
-
-    //TODO Deze if is een niet heel belangrijke optimalisatie, maar goed.
-    //Als ik het goed heb begrepen doe je met deze if een shallow comparison,
-    //die een verschill oplevert als de reference anders is geworden.
-    //Als movePlayer een wijzigen heeft gedaan levert die een nieuwe reference op.
-    //Hier checken: https://t.co/wMxnbQkgwh?amp=1
     if (updatedMaze !== maze) setMaze(updatedMaze);
   }
 

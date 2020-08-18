@@ -78,3 +78,16 @@ h1 {
 .score {
   font-size: 30px;
 }
+
+#pacman {
+  background: red;
+  width: 200px;
+}
+
+#pacman circle {
+  stroke: yellow;
+  stroke-dasharray: 126, 100;
+  stroke-dashoffset: -15;
+  stroke-width: 50%;
+  fill: none;
+}
