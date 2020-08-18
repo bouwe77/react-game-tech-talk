@@ -1,8 +1,8 @@
 import { itemType } from "../functions";
 //import mazeTemplate from "./testmaze.js";
-// //import mazeTemplate from "./maze1.js";
-// //import mazeTemplate from "./kpn.js";
-import mazeTemplate from "./newnexus.js";
+//import mazeTemplate from "./maze1.js";
+import mazeTemplate from "./kpn.js";
+//import mazeTemplate from "./newnexus.js";
 
 export const defaultItemSize = 20;
 
