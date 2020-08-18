@@ -31,7 +31,8 @@ export default function App() {
   }, 400);
 
   useEffect(() => {
-    addFood(maze);
+    const updatedMaze = addFood(maze);
+    if (updatedMaze !== maze) setMaze(updatedMaze);
   }, [maze]);
 
   function move(direction) {
@@ -84,6 +85,7 @@ function Item({ item }) {
   if (item.type === itemType.WALL) return <Wall wall={item} />;
   if (item.type === itemType.PLAYER) return <Player player={item} />;
   if (item.type === itemType.DOT) return <Dot dot={item} />;
+  if (item.type === itemType.EXIT) return <Dot dot={item} />;
   if (item.type === itemType.FOOD) return <Food food={item} />;
   else return null;
 }

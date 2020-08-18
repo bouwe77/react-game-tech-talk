@@ -13,6 +13,7 @@ export const itemType = {
   WALL: "wall",
   DOT: "dot",
   FOOD: "food",
+  EXIT: "exit",
   NONE: "none"
 };
 
@@ -28,13 +29,43 @@ export function movePlayer(maze, direction, onMove = null) {
   // Do nothing if the player had already reached the exit.
   if (maze.playerIndex === maze.exitIndex) return maze;
 
+  // Call the onMove callback (if provided) and pass the item which the player will replace.
   if (onMove) onMove(maze.items[newIndex]);
 
-  // Update the new player position in the maze.
-  const updatedMaze = { ...maze, playerIndex: newIndex };
+  // Create a copy of the maze and update the new player index in the maze.
+  const updatedMaze = { ...maze, items: [...maze.items], playerIndex: newIndex };
 
-  updatedMaze.items[maze.playerIndex].type = itemType.NONE;
-  updatedMaze.items[newIndex].type = itemType.PLAYER;
+  // Set the item type of the previous player position to none.
+  updatedMaze.items[maze.playerIndex] = {
+    ...maze.items[maze.playerIndex],
+    type: itemType.NONE
+  };
+
+  // Set the item type of the new player position to player.
+  updatedMaze.items[newIndex] = { ...maze.items[newIndex], type: itemType.PLAYER };
+
+  // Decrement the food counter if the player ate food.
+  if (maze.items[newIndex].type === itemType.FOOD) updatedMaze.currentFoods--;
+
+  return updatedMaze;
+}
+
+export function addFood(maze) {
+  if (maze.currentFoods === howManyFood) return maze;
+
+  const number = howManyFood - maze.currentFoods;
+
+  // Pick some random positions.
+  const randomPositions = maze.items
+    .filter((item) => item.type === itemType.DOT || item.type === itemType.NONE)
+    .sort(() => Math.random() - Math.random())
+    .slice(0, number);
+
+  // Create food on that positions.
+  const updatedMaze = { ...maze, currentFoods: number };
+  randomPositions.forEach((pos) => {
+    updatedMaze.items[pos.id] = { ...maze.items[pos.id], type: itemType.FOOD };
+  });
 
   return updatedMaze;
 }
@@ -52,11 +83,4 @@ function determineNewIndex(currentIndex, columns, direction) {
     default:
       return -1;
   }
-}
-
-export function addFood(maze) {
-  if (maze.currentFoods === howManyFood) return maze;
-
-  //TODO Create random food
-  return maze;
 }
