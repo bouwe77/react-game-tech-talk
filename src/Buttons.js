@@ -1,7 +1,7 @@
 import React from "react";
 import { directions } from "./functions";
 
-export default function Buttons({ buttonClicked, disabled }) {
+export default function Buttons({ buttonClicked = () => {}, disabled = false }) {
   return (
     <div>
       <div>
