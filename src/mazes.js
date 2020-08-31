@@ -124,6 +124,7 @@ export function getMaze() {
 
   mazeTemplate.split("\n").forEach((line) => {
     line.split("").forEach((character) => {
+      if (character === " ") return;
       if (character === "X") maze.items.push(createWall(x, y));
       else if (character === ".") maze.items.push(createDot(x, y));
       else if (character === "P") {
