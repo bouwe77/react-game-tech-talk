@@ -3,7 +3,8 @@ import Modal from "./Modal";
 import Buttons from "./Buttons";
 import { useKeyPress } from "./useKeyPress";
 import { useInterval } from "./useInterval";
-import { itemType, directions, movePlayer, addFood, getMaze } from "./functions";
+import { itemType, directions, movePlayer, addFood } from "./functions";
+import { getMaze } from "./mazes";
 
 const initialState = {
   getMaze: () => getMaze(),
