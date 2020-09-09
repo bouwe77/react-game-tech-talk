@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Modal from "./Modal";
+import GameOver from "./GameOver";
 import Buttons from "./Buttons";
 import { useKeyPress } from "./useKeyPress";
 import { useInterval } from "./useInterval";
@@ -122,20 +122,4 @@ function Food({ food }) {
 
 function Score({ score }) {
   return <div className="score">score: {score}</div>;
-}
-
-function GameOver({ score, resetGame }) {
-  return (
-    <Modal>
-      <h3>YES!!!</h3>
-      <p>
-        You scored {score} points, good job!
-        <br />
-        <br />
-        <button autoFocus onClick={resetGame}>
-          Try again
-        </button>
-      </p>
-    </Modal>
-  );
 }
