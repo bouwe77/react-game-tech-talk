@@ -28,7 +28,7 @@ export default function App() {
     //TODO Deze if kan weg als de interval milliseconden stateful wordt
     if (direction === directions.IDLE || gameOver) return;
 
-    move(direction);
+    moveToDirection();
   }, 400);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function App() {
     if (updatedMaze !== maze) setMaze(updatedMaze);
   }, [maze]);
 
-  function move(direction) {
+  function moveToDirection() {
     const updatedMaze = movePlayer(maze, direction, updateScore);
     if (updatedMaze !== maze) setMaze(updatedMaze);
   }
