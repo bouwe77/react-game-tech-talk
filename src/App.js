@@ -7,9 +7,9 @@ import { itemType, directions, movePlayer, addFood } from "./functions";
 import { getMaze } from "./mazes";
 
 const initialState = {
-  getMaze: () => getMaze(),
+  getMaze,
   direction: directions.IDLE,
-  score: 0
+  score: 0,
 };
 
 export default function App() {
@@ -46,10 +46,6 @@ export default function App() {
     else if (item.type === itemType.FOOD) setScore(score + 10);
   }
 
-  function changeDirection(direction) {
-    setDirection(direction);
-  }
-
   function resetGame() {
     setMaze(initialState.getMaze());
     setDirection(initialState.direction);
@@ -70,7 +66,10 @@ export default function App() {
         ))}
       </Maze>
 
-      <Buttons buttonClicked={changeDirection} disabled={gameOver} />
+      <Buttons
+        buttonClicked={(direction) => setDirection(direction)}
+        disabled={gameOver}
+      />
     </div>
   );
 }
@@ -113,7 +112,15 @@ function Wall({ wall }) {
 }
 
 function Dot({ dot }) {
-  return <circle key={`${dot.x}-${dot.y}`} cx={dot.x} cy={dot.y} r={2} fill="green" />;
+  return (
+    <circle
+      key={`${dot.x}-${dot.y}`}
+      cx={dot.x}
+      cy={dot.y}
+      r={2}
+      fill="green"
+    />
+  );
 }
 
 function Food({ food }) {

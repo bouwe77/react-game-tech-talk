@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function GameOver({ score, resetGame }) {
+export default function GameOver({ score = 0, resetGame = () => {} }) {
   return (
     <Modal>
       <h3>YES!!!</h3>
