@@ -72,13 +72,13 @@ const mazes = {
   X.X..X..X.....X..XX....X...X....X
   X.X...X.X.....X...X.....XXX.....X
   X...............................X
-  XXXXXXXXXXXXXXXXXEXXXXXXXXXXXXXXX`
+  XXXXXXXXXXXXXXXXXEXXXXXXXXXXXXXXX`,
 };
 
 export const defaultItemSize = 20;
 
-const mazeTemplate = mazes.test;
-//const mazeTemplate = mazes.newnexus;
+//const mazeTemplate = mazes.test;
+const mazeTemplate = mazes.newnexus;
 //const mazeTemplate = mazes.kpn;
 //const mazeTemplate = mazes.maze1;
 //const mazeTemplate = mazes.maze2;
@@ -115,7 +115,7 @@ export function getMaze() {
     height: mazeTemplate.split("\n").length * defaultItemSize,
     columns,
     currentFoods: 0,
-    items: []
+    items: [],
   };
 
   let index = 0;
@@ -154,7 +154,7 @@ function createDot(x, y) {
     x: x + defaultItemSize / 2,
     y: y + defaultItemSize / 2,
     size: 2,
-    type: itemType.DOT
+    type: itemType.DOT,
   };
 }
 
@@ -163,7 +163,7 @@ function createPlayer(x, y) {
     x: x + defaultItemSize / 2,
     y: y + defaultItemSize / 2,
     size: 7,
-    type: itemType.PLAYER
+    type: itemType.PLAYER,
   };
 }
 
@@ -172,6 +172,6 @@ function createExit(x, y) {
     x: x + defaultItemSize / 2,
     y: y + defaultItemSize / 2,
     size: 2,
-    type: itemType.EXIT
+    type: itemType.EXIT,
   };
 }

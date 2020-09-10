@@ -1,11 +1,11 @@
-const howManyFood = 1;
+const howManyFood = 3;
 
 export const directions = {
   IDLE: "idle",
   UP: "up",
   DOWN: "down",
   LEFT: "left",
-  RIGHT: "right"
+  RIGHT: "right",
 };
 
 export const itemType = {
@@ -14,7 +14,7 @@ export const itemType = {
   DOT: "dot",
   FOOD: "food",
   EXIT: "exit",
-  NONE: "none"
+  NONE: "none",
 };
 
 export function movePlayer(maze, direction, onMove = null) {
@@ -33,16 +33,23 @@ export function movePlayer(maze, direction, onMove = null) {
   if (onMove) onMove(maze.items[newIndex]);
 
   // Create a copy of the maze and update the new player index in the maze.
-  const updatedMaze = { ...maze, items: [...maze.items], playerIndex: newIndex };
+  const updatedMaze = {
+    ...maze,
+    items: [...maze.items],
+    playerIndex: newIndex,
+  };
 
   // Set the item type of the previous player position to none.
   updatedMaze.items[maze.playerIndex] = {
     ...maze.items[maze.playerIndex],
-    type: itemType.NONE
+    type: itemType.NONE,
   };
 
   // Set the item type of the new player position to player.
-  updatedMaze.items[newIndex] = { ...maze.items[newIndex], type: itemType.PLAYER };
+  updatedMaze.items[newIndex] = {
+    ...maze.items[newIndex],
+    type: itemType.PLAYER,
+  };
 
   // Decrement the food counter if the player ate food.
   if (maze.items[newIndex].type === itemType.FOOD) updatedMaze.currentFoods--;
@@ -62,7 +69,7 @@ export function addFood(maze) {
     .slice(0, number);
 
   // Create food on that positions.
-  const updatedMaze = { ...maze, currentFoods: number };
+  const updatedMaze = { ...maze, currentFoods: howManyFood };
   randomPositions.forEach((pos) => {
     updatedMaze.items[pos.id] = { ...maze.items[pos.id], type: itemType.FOOD };
   });
