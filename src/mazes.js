@@ -64,11 +64,11 @@ const mazes = {
   X.X...X.X.....X.....X.....X...X.X
   X.XXXXX.XXXX..X.....X.....X...X.X
   X.X...X.X.....X.....X.....X...X.X
-  X.X...X.XXXXX.XXXXX.XXXXX.XXXXX.X
+  X.X...X.XXXXX.XXXXX.XXXXX.X.XXX.X
   X...............................X
   X.X...X.XXXXX.X...X.....X.X.....X
   X.X..X..X...X.XX..X.............X
-  X.XXX...XXXXX.X.X.X...X.....X...X
+  X.XXX...X.XXX.X.X.X...X.....X...X
   X.X..X..X.....X..XX....X...X....X
   X.X...X.X.....X...X.....XXX.....X
   X...............................X
