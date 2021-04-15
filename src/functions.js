@@ -14,7 +14,7 @@ export const itemType = {
   DOT: "dot",
   FOOD: "food",
   EXIT: "exit",
-  NONE: "none",
+  EMPTY: "empty",
 };
 
 export function movePlayer(maze, direction, onMove = null) {
@@ -39,10 +39,10 @@ export function movePlayer(maze, direction, onMove = null) {
     playerIndex: newIndex,
   };
 
-  // Set the item type of the previous player position to none.
+  // Set the item type of the previous player position to empty.
   updatedMaze.items[maze.playerIndex] = {
     ...maze.items[maze.playerIndex],
-    type: itemType.NONE,
+    type: itemType.EMPTY,
   };
 
   // Set the item type of the new player position to player.
@@ -64,7 +64,9 @@ export function addFood(maze) {
 
   // Pick some random positions.
   const randomPositions = maze.items
-    .filter((item) => item.type === itemType.DOT || item.type === itemType.NONE)
+    .filter(
+      (item) => item.type === itemType.DOT || item.type === itemType.EMPTY
+    )
     .sort(() => Math.random() - Math.random())
     .slice(0, number);
 
