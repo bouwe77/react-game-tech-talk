@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 
 export default function GameOver({ score = 0, resetGame = () => {} }) {
   return (
@@ -13,7 +13,7 @@ export default function GameOver({ score = 0, resetGame = () => {} }) {
         </button>
       </p>
     </Modal>
-  );
+  )
 }
 
 const Modal = ({ children }) => {
@@ -21,5 +21,5 @@ const Modal = ({ children }) => {
     <div className="modal display-block">
       <section className="modal-main">{children}</section>
     </div>
-  );
-};
+  )
+}

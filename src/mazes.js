@@ -1,4 +1,4 @@
-import { itemType } from "./functions";
+import { itemTypes } from './functions'
 
 const mazes = {
   test: `XPX
@@ -73,11 +73,11 @@ const mazes = {
   X X   X X     X   X     XXX     X
   X                               X
   XXXXXXXXXXXXXXXXXEXXXXXXXXXXXXXXX`,
-};
+}
 
-export const defaultItemSize = 20;
+export const defaultItemSize = 20
 
-const mazeTemplate = mazes.test;
+const mazeTemplate = mazes.test
 //const mazeTemplate = mazes.newnexus;
 //const mazeTemplate = mazes.kpn;
 //const mazeTemplate = mazes.maze1;
@@ -92,62 +92,62 @@ const mazeTemplate = mazes.test;
 //   exitIndex: 10,
 //   currentFoods: 1,
 //   items: [
-//     { id: 0, x: 0, y: 0, type: itemType.WALL },
-//     { id: 1, x: 30, y: 10, type: itemType.PLAYER },
-//     { id: 2, x: 40, y: 0, type: itemType.WALL },
-//     { id: 3, x: 0, y: 20, type: itemType.WALL },
-//     { id: 4, x: 30, y: 30, type: itemType.FOOD },
-//     { id: 5, x: 40, y: 20, type: itemType.WALL },
-//     { id: 6, x: 0, y: 40, type: itemType.WALL },
-//     { id: 7, x: 30, y: 50, type: itemType.DOT },
-//     { id: 8, x: 40, y: 40, type: itemType.WALL },
-//     { id: 9, x: 0, y: 60, type: itemType.WALL },
-//     { id: 10, x: 30, y: 70, type: itemType.DOT },
-//     { id: 11, x: 40, y: 60, type: itemType.WALL }
+//     { id: 0, x: 0, y: 0, type: itemTypes.WALL },
+//     { id: 1, x: 30, y: 10, type: itemTypes.PLAYER },
+//     { id: 2, x: 40, y: 0, type: itemTypes.WALL },
+//     { id: 3, x: 0, y: 20, type: itemTypes.WALL },
+//     { id: 4, x: 30, y: 30, type: itemTypes.FOOD },
+//     { id: 5, x: 40, y: 20, type: itemTypes.WALL },
+//     { id: 6, x: 0, y: 40, type: itemTypes.WALL },
+//     { id: 7, x: 30, y: 50, type: itemTypes.DOT },
+//     { id: 8, x: 40, y: 40, type: itemTypes.WALL },
+//     { id: 9, x: 0, y: 60, type: itemTypes.WALL },
+//     { id: 10, x: 30, y: 70, type: itemTypes.DOT },
+//     { id: 11, x: 40, y: 60, type: itemTypes.WALL }
 //   ]
 // };
 
 export function getMaze() {
-  const columns = mazeTemplate.split("\n")[0].length;
+  const columns = mazeTemplate.split('\n')[0].length
 
   const maze = {
     width: columns * defaultItemSize,
-    height: mazeTemplate.split("\n").length * defaultItemSize,
+    height: mazeTemplate.split('\n').length * defaultItemSize,
     columns,
     currentFoods: 0,
     items: [],
-  };
+  }
 
-  let index = 0;
-  let x = 0;
-  let y = 0;
+  let index = 0
+  let x = 0
+  let y = 0
 
-  mazeTemplate.split("\n").forEach((line) => {
-    const characters = [...line.trim()];
+  mazeTemplate.split('\n').forEach((line) => {
+    const characters = [...line.trim()]
     characters.forEach((character) => {
-      if (character === ".") return;
-      if (character === "X") maze.items.push(createWall(x, y));
-      else if (character === " ") maze.items.push(createDot(x, y));
-      else if (character === "P") {
-        maze.items.push(createPlayer(x, y));
-        maze.playerIndex = index;
-      } else if (character === "E") {
-        maze.items.push(createExit(x, y));
-        maze.exitIndex = index;
+      if (character === '.') return
+      if (character === 'X') maze.items.push(createWall(x, y))
+      else if (character === ' ') maze.items.push(createDot(x, y))
+      else if (character === 'P') {
+        maze.items.push(createPlayer(x, y))
+        maze.playerIndex = index
+      } else if (character === 'E') {
+        maze.items.push(createExit(x, y))
+        maze.exitIndex = index
       }
-      maze.items[index].id = index;
-      index++;
-      x += defaultItemSize;
-    });
-    x = 0;
-    y += defaultItemSize;
-  });
+      maze.items[index].id = index
+      index++
+      x += defaultItemSize
+    })
+    x = 0
+    y += defaultItemSize
+  })
 
-  return maze;
+  return maze
 }
 
 function createWall(x, y) {
-  return { x, y, size: defaultItemSize, type: itemType.WALL };
+  return { x, y, size: defaultItemSize, type: itemTypes.WALL }
 }
 
 function createDot(x, y) {
@@ -155,8 +155,8 @@ function createDot(x, y) {
     x: x + defaultItemSize / 2,
     y: y + defaultItemSize / 2,
     size: 2,
-    type: itemType.DOT,
-  };
+    type: itemTypes.DOT,
+  }
 }
 
 function createPlayer(x, y) {
@@ -164,8 +164,8 @@ function createPlayer(x, y) {
     x: x + defaultItemSize / 2,
     y: y + defaultItemSize / 2,
     size: 7,
-    type: itemType.PLAYER,
-  };
+    type: itemTypes.PLAYER,
+  }
 }
 
 function createExit(x, y) {
@@ -173,6 +173,6 @@ function createExit(x, y) {
     x: x + defaultItemSize / 2,
     y: y + defaultItemSize / 2,
     size: 2,
-    type: itemType.EXIT,
-  };
+    type: itemTypes.EXIT,
+  }
 }

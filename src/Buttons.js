@@ -1,7 +1,10 @@
-import React from "react";
-import { directions } from "./functions";
+import React from 'react'
+import { directions } from './functions'
 
-export default function Buttons({ buttonClicked = () => {}, disabled = false }) {
+export default function Buttons({
+  buttonClicked = () => {},
+  disabled = false,
+}) {
   return (
     <div>
       <div>
@@ -16,7 +19,7 @@ export default function Buttons({ buttonClicked = () => {}, disabled = false }) 
       <div>
         <button
           onClick={() => buttonClicked(directions.LEFT)}
-          style={{ marginRight: "60px" }}
+          style={{ marginRight: '60px' }}
           disabled={disabled}
           className="arrowButton"
         >
@@ -40,5 +43,5 @@ export default function Buttons({ buttonClicked = () => {}, disabled = false }) 
         </button>
       </div>
     </div>
-  );
+  )
 }
