@@ -2,84 +2,84 @@ import { itemType } from "./functions";
 
 const mazes = {
   test: `XPX
-  X.X
-  X.X
-  X.X
-  X.X
-  X.X
+  X X
+  X X
+  X X
+  X X
+  X X
   XEX`,
 
   maze1: `XPXXXXXXXXXXXXXXXXXX
-  X....X....X....X...X
-  X.X..X.X..X.X..X.X.X
-  X.XX.X.XX.X.XX.X...X
-  X................XXX
-  X.XX.X.X.XXXXXXXX..E
-  X.X..XXX.X......X.XX
-  X.XX.X.X.XX.X.X....X
-  X............X..X.XX
+  X    X    X    X   X
+  X X  X X  X X  X X X
+  X XX X XX X XX X   X
+  X                XXX
+  X XX X X XXXXXXXX  E
+  X X  XXX X      X XX
+  X XX X X XX X X    X
+  X            X  X XX
   XXXXXXXXXXXXXXXXXXXX`,
 
   maze2: `XPXXXXXXXXXXXXXXXXXX
-  X........X...X.....X
-  X.X.X.XX.X.X.X.XXX.X
-  X...X......X.......X
-  XX.XXXX.XX.X.X.XX.XX
-  X..X....XX.X.X.XX.XX
-  X.XX.X.XXX...X.....X
-  X....X...X.XXX.XXX.X
-  XXX.XX.XX......X...X
+  X        X   X     X
+  X X X XX X X X XXX X
+  X   X      X       X
+  XX XXXX XX X X XX XX
+  X  X    XX X X XX XX
+  X XX X XXX   X     X
+  X    X   X XXX XXX X
+  XXX XX XX      X   X
   XXXXXXXXXXXXXXXXEXXX`,
 
   maze3: `XPXXXXXXXXXXXXXXXXXX
-  X..................X
-  XXXXXXXXXXXXXXXXXX.X
-  X..................X
-  X.XXXXXXXXXXXXXXXXXX
-  X..................X
-  X.XXX.XX.XX.XX.XXX.X
-  X.XXX.XX.XX.XX.XXX.X
-  X.......X..X.......X
+  X                  X
+  XXXXXXXXXXXXXXXXXX X
+  X                  X
+  X XXXXXXXXXXXXXXXXXX
+  X                  X
+  X XXX XX XX XX XXX X
+  X XXX XX XX XX XXX X
+  X       X  X       X
   XXXXXXXXXXXXXXXXEXXX`,
 
   newnexus: `XPXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-  X.............................X
-  X.X...X.XXXX.X...X............X
-  X.XX..X.X....X...X............X
-  X.X.X.X.XXX..X.X.X............X
-  X.X..XX.X....X.X.X............X
-  X.X...X.XXXX.XX.XX............X
-  X.............................X
-  X.X...X.XXXX.X...X.X...X.XXXX.X
-  X.XX..X.X.....X.X..X...X.X....X
-  X.X.X.X.XXX....X...X...X.XXXX.X
-  X.X..XX.X.....X.X..X...X....X.X
-  X.X...X.XXXX.X...X.XXXXX.XXXX.X
-  X.............................X
+  X                             X
+  X X   X XXXX X   X            X
+  X XX  X X    X   X            X
+  X X X X XXX  X X X            X
+  X X  XX X    X X X            X
+  X X   X XXXX XX XX            X
+  X                             X
+  X X   X XXXX X   X X   X XXXX X
+  X XX  X X     X X  X   X X    X
+  X X X X XXX    X   X   X XXXX X
+  X X  XX X     X X  X   X    X X
+  X X   X XXXX X   X XXXXX XXXX X
+  X                             X
   XXXXXXXXXXXXXXXEXXXXXXXXXXXXXXX`,
 
   kpn: `XPXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-  X...............................X
-  X.X...X.XXXXX.X.....X.....XXXXX.X
-  X.X...X.X.....X.....X.....X...X.X
-  X.XXXXX.XXXX..X.....X.....X...X.X
-  X.X...X.X.....X.....X.....X...X.X
-  X.X...X.XXXXX.XXXXX.XXXXX.X.XXX.X
-  X...............................X
-  X.X...X.XXXXX.X...X.....X.X.....X
-  X.X..X..X...X.XX..X.............X
-  X.XXX...X.XXX.X.X.X...X.....X...X
-  X.X..X..X.....X..XX....X...X....X
-  X.X...X.X.....X...X.....XXX.....X
-  X...............................X
+  X                               X
+  X X   X XXXXX X     X     XXXXX X
+  X X   X X     X     X     X   X X
+  X XXXXX XXXX  X     X     X   X X
+  X X   X X     X     X     X   X X
+  X X   X XXXXX XXXXX XXXXX X XXX X
+  X                               X
+  X X   X XXXXX X   X     X X     X
+  X X  X  X   X XX  X             X
+  X XXX   X XXX X X X   X     X   X
+  X X  X  X     X  XX    X   X    X
+  X X   X X     X   X     XXX     X
+  X                               X
   XXXXXXXXXXXXXXXXXEXXXXXXXXXXXXXXX`,
 };
 
 export const defaultItemSize = 20;
 
 //const mazeTemplate = mazes.test;
-//const mazeTemplate = mazes.newnexus;
-const mazeTemplate = mazes.kpn;
+const mazeTemplate = mazes.newnexus;
+//const mazeTemplate = mazes.kpn;
 //const mazeTemplate = mazes.maze1;
 //const mazeTemplate = mazes.maze2;
 //const mazeTemplate = mazes.maze3;
@@ -123,10 +123,11 @@ export function getMaze() {
   let y = 0;
 
   mazeTemplate.split("\n").forEach((line) => {
-    line.split("").forEach((character) => {
-      if (character === " ") return;
+    const characters = [...line.trim()];
+    characters.forEach((character) => {
+      if (character === ".") return;
       if (character === "X") maze.items.push(createWall(x, y));
-      else if (character === ".") maze.items.push(createDot(x, y));
+      else if (character === " ") maze.items.push(createDot(x, y));
       else if (character === "P") {
         maze.items.push(createPlayer(x, y));
         maze.playerIndex = index;

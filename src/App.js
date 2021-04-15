@@ -10,12 +10,14 @@ const initialState = {
   getMaze,
   direction: directions.IDLE,
   score: 0,
+  interval: 400,
 };
 
 export default function App() {
   const [maze, setMaze] = useState(initialState.getMaze);
   const [direction, setDirection] = useState(initialState.direction);
   const [score, setScore] = useState(initialState.score);
+  const [interval, setInterval] = useState(initialState.interval);
 
   const gameOver = maze.playerIndex === maze.exitIndex;
 
@@ -25,16 +27,15 @@ export default function App() {
   useKeyPress("ArrowRight", () => setDirection(directions.RIGHT));
 
   useInterval(() => {
-    //TODO Deze if kan weg als de interval milliseconden stateful wordt
-    if (direction === directions.IDLE || gameOver) return;
-
+    console.log("move...");
     moveToDirection();
-  }, 400);
+  }, interval);
 
   useEffect(() => {
     const updatedMaze = addFood(maze);
+    if (gameOver) setInterval(null);
     if (updatedMaze !== maze) setMaze(updatedMaze);
-  }, [maze]);
+  }, [maze, gameOver]);
 
   function moveToDirection() {
     const updatedMaze = movePlayer(maze, direction, updateScore);
@@ -50,11 +51,12 @@ export default function App() {
     setMaze(initialState.getMaze());
     setDirection(initialState.direction);
     setScore(initialState.score);
+    setInterval(initialState.interval);
   }
 
   return (
     <div style={{ textAlign: "center" }}>
-      <h1>My Game</h1>
+      <h1>REPACTMAN</h1>
 
       {gameOver && <GameOver score={score} resetGame={resetGame} />}
 
@@ -89,7 +91,7 @@ function Item({ item }) {
   if (item.type === itemType.DOT) return <Dot dot={item} />;
   if (item.type === itemType.EXIT) return <Dot dot={item} />;
   if (item.type === itemType.FOOD) return <Food food={item} />;
-  else return null;
+  return null;
 }
 
 function Player({ player }) {
