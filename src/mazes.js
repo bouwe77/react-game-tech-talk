@@ -77,8 +77,8 @@ const mazes = {
 
 export const defaultItemSize = 20;
 
-//const mazeTemplate = mazes.test;
-const mazeTemplate = mazes.newnexus;
+const mazeTemplate = mazes.test;
+//const mazeTemplate = mazes.newnexus;
 //const mazeTemplate = mazes.kpn;
 //const mazeTemplate = mazes.maze1;
 //const mazeTemplate = mazes.maze2;
