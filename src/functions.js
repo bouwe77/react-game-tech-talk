@@ -1,7 +1,7 @@
 const howManyFood = 3
 
 export const directions = {
-  IDLE: 'idle',
+  NONE: 'none',
   UP: 'up',
   DOWN: 'down',
   LEFT: 'left',

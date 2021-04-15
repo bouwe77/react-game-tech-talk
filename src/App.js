@@ -8,7 +8,7 @@ import { getMaze } from './mazes'
 
 const initialState = {
   getMaze,
-  direction: directions.IDLE,
+  direction: directions.NONE,
   score: 0,
   interval: 400,
 }
@@ -27,7 +27,7 @@ export default function App() {
   useKeyPress('ArrowRight', () => setDirection(directions.RIGHT))
 
   useInterval(() => {
-    console.log('move...')
+    if (direction === directions.NONE) return
     moveToDirection()
   }, interval)
 
