@@ -13,13 +13,13 @@ const initialState = {
   interval: 400,
 }
 
+const defaultItemSize = 20
+
 export default function App() {
   const [maze, setMaze] = useState(initialState.getMaze)
   const [direction, setDirection] = useState(initialState.direction)
   const [score, setScore] = useState(initialState.score)
   const [interval, setInterval] = useState(initialState.interval)
-
-  const gameOver = maze.playerIndex === maze.exitIndex
 
   useKeyPress('ArrowUp', () => setDirection(directions.UP))
   useKeyPress('ArrowDown', () => setDirection(directions.DOWN))
@@ -33,9 +33,9 @@ export default function App() {
 
   useEffect(() => {
     const updatedMaze = addFood(maze)
-    if (gameOver) setInterval(null)
+    if (maze.reachedExit) setInterval(null)
     if (updatedMaze !== maze) setMaze(updatedMaze)
-  }, [maze, gameOver])
+  }, [maze])
 
   function moveToDirection() {
     const updatedMaze = movePlayer(maze, direction, updateScore)
@@ -43,8 +43,8 @@ export default function App() {
   }
 
   function updateScore(item) {
-    if (item.type === itemTypes.DOT) setScore(score + 1)
-    else if (item.type === itemTypes.FOOD) setScore(score + 10)
+    if (item === itemTypes.DOT || item === itemTypes.EXIT) setScore(score + 1)
+    if (item === itemTypes.FOOD) setScore(score + 10)
   }
 
   function resetGame() {
@@ -54,23 +54,38 @@ export default function App() {
     setInterval(initialState.interval)
   }
 
+  let x = 0
+  let y = 0
+
   return (
     <div style={{ textAlign: 'center' }}>
       <h1>REPACTMAN</h1>
 
-      {gameOver && <GameOver score={score} resetGame={resetGame} />}
+      {maze.reachedExit && <GameOver score={score} resetGame={resetGame} />}
 
       <Score score={score} />
 
-      <Maze width={maze.width} height={maze.height}>
-        {maze.items.map((item) => (
-          <Item key={item.id} item={item} />
-        ))}
+      <Maze
+        width={maze.itemsPerRow * defaultItemSize}
+        height={maze.numberOfRows * defaultItemSize}
+      >
+        {maze.items.map((item, index) => {
+          const itemComponent = (
+            <Item key={`${item}-${x}-${y}`} item={item} x={x} y={y} />
+          )
+          x += defaultItemSize
+          if ((index + 1) % maze.itemsPerRow === 0) {
+            x = 0
+            y += defaultItemSize
+          }
+
+          return itemComponent
+        })}
       </Maze>
 
       <Buttons
         buttonClicked={(direction) => setDirection(direction)}
-        disabled={gameOver}
+        disabled={maze.reachedExit}
       />
     </div>
   )
@@ -85,26 +100,33 @@ function Maze({ width, height, children }) {
   )
 }
 
-function Item({ item }) {
-  if (item.type === itemTypes.WALL) return <Wall wall={item} />
-  if (item.type === itemTypes.PLAYER) return <Player player={item} />
-  if (item.type === itemTypes.DOT) return <Dot dot={item} />
-  if (item.type === itemTypes.EXIT) return <Dot dot={item} />
-  if (item.type === itemTypes.FOOD) return <Food food={item} />
+function Item({ item, x, y }) {
+  if (item === itemTypes.WALL) return <Wall x={x} y={y} />
+  if (item === itemTypes.PLAYER) return <Player x={x} y={y} />
+  if (item === itemTypes.DOT) return <Dot x={x} y={y} />
+  if (item === itemTypes.EXIT) return <Dot x={x} y={y} />
+  if (item === itemTypes.FOOD) return <Food x={x} y={y} />
   return null
 }
 
-function Player({ player }) {
-  return <circle cx={player.x} cy={player.y} r={7} fill="yellow" />
+function Player({ x, y }) {
+  return (
+    <circle
+      cx={x + defaultItemSize / 2}
+      cy={y + defaultItemSize / 2}
+      r={7}
+      fill="yellow"
+    />
+  )
 }
 
-function Wall({ wall }) {
+function Wall({ x, y }) {
   return (
     <rect
-      width={20}
-      height={20}
-      x={wall.x}
-      y={wall.y}
+      width={defaultItemSize}
+      height={defaultItemSize}
+      x={x}
+      y={y}
       fill="brown"
       rx="5"
       ry="5"
@@ -113,20 +135,27 @@ function Wall({ wall }) {
   )
 }
 
-function Dot({ dot }) {
+function Dot({ x, y }) {
   return (
     <circle
-      key={`${dot.x}-${dot.y}`}
-      cx={dot.x}
-      cy={dot.y}
+      key={`${x}-${y}`}
+      cx={x + defaultItemSize / 2}
+      cy={y + defaultItemSize / 2}
       r={2}
       fill="green"
     />
   )
 }
 
-function Food({ food }) {
-  return <circle cx={food.x} cy={food.y} r={7} fill="green" />
+function Food({ x, y }) {
+  return (
+    <circle
+      cx={x + defaultItemSize / 2}
+      cy={y + defaultItemSize / 2}
+      r={7}
+      fill="green"
+    />
+  )
 }
 
 function Score({ score }) {
