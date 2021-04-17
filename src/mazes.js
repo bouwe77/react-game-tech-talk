@@ -1,6 +1,4 @@
-import { itemTypes } from './functions'
-
-const mazes = {
+export const mazeTemplates = {
   test: {
     items: `XPX
   X.X
@@ -97,27 +95,4 @@ const mazes = {
     itemsPerRow: 33,
     numberOfRows: 15,
   },
-}
-
-const mazeTemplate = mazes.test
-//const mazeTemplate = mazes.newnexus
-//const mazeTemplate = mazes.kpn;
-//const mazeTemplate = mazes.maze1;
-//const mazeTemplate = mazes.maze2;
-//const mazeTemplate = mazes.maze3;
-
-export function getMaze() {
-  const items = mazeTemplate.items.replace(/\s/g, '').split('')
-
-  const maze = {
-    currentFoods: 0,
-    reachedExit: false,
-    items,
-    numberOfRows: mazeTemplate.numberOfRows,
-    itemsPerRow: mazeTemplate.itemsPerRow,
-    playerIndex: items.indexOf(itemTypes.PLAYER),
-    exitIndex: items.indexOf(itemTypes.EXIT),
-  }
-
-  return maze
 }

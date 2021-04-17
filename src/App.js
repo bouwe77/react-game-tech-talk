@@ -3,8 +3,7 @@ import GameOver from './GameOver'
 import Buttons from './Buttons'
 import { useKeyPress } from './useKeyPress'
 import { useInterval } from './useInterval'
-import { itemTypes, directions, movePlayer, addFood } from './functions'
-import { getMaze } from './mazes'
+import { getMaze, itemTypes, directions, movePlayer } from './functions'
 
 const initialState = {
   getMaze,
@@ -32,9 +31,9 @@ export default function App() {
   }, interval)
 
   useEffect(() => {
-    const updatedMaze = addFood(maze)
+    //const updatedMaze = addFood(maze)
     if (maze.reachedExit) setInterval(null)
-    if (updatedMaze !== maze) setMaze(updatedMaze)
+    //if (updatedMaze !== maze) setMaze(updatedMaze)
   }, [maze])
 
   function moveToDirection() {
