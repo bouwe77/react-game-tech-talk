@@ -16,13 +16,13 @@ export const itemTypes = {
   DOT: '.',
   FOOD: 'F',
   EXIT: 'E',
-  EMPTY: '-',
+  EMPTY: ' ',
 }
 
-export function getMaze() {
-  const maze = getMazeFromTemplate(mazeTemplates.test)
-  return addFood(maze)
-}
+const pipe = (...fns) => (x) => fns.reduce((y, f) => f(y), x)
+const createMaze = pipe(getMazeFromTemplate, addFood)
+
+export const getMaze = () => createMaze(mazeTemplates.test)
 
 function getMazeFromTemplate(mazeTemplate) {
   const items = mazeTemplate.items.replace(/\s/g, '').split('')
