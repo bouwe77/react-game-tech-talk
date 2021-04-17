@@ -47,8 +47,6 @@ function moveGhosts(maze) {
     updatedMaze = moveGhost(updatedMaze, ghostsIndex)
   }
 
-  console.log(updatedMaze)
-
   return updatedMaze
 }
 
@@ -62,6 +60,9 @@ function moveGhost(maze, ghostsIndex) {
   )
   const direction = getRandom(possibleDirections)
   const onMove = () => {}
+
+  //TODO Bug: Ghost vervangt denk ik de EXIT door iets anders, zodat exitReached opeens true wordt?
+  //TODO Bovendien wordt de player ook vervangen, dat moet (nog) niet...
 
   const updatedMaze = moveItem(
     maze,
@@ -84,15 +85,18 @@ function moveGhost(maze, ghostsIndex) {
   return updatedMaze
 }
 
-function moveItem(maze, itemCurrentIndex, itemType, direction, onMove, piet) {
-  const itemNewIndex = determineNewIndex(
-    itemCurrentIndex,
-    maze.itemsPerRow,
-    direction,
-  )
+function moveItem(
+  maze,
+  itemCurrentIndex,
+  itemType,
+  direction,
+  onMove,
+  replaceByItemType,
+) {
+  const itemNewIndex = determineNewIndex(itemCurrentIndex, maze, direction)
 
-  // Do nothing if the item goes outside the maze.
-  if (itemNewIndex < 0 || itemNewIndex > maze.items.length - 1) return maze
+  // Do nothing if you can't go that way.
+  if (itemNewIndex === -1) return maze
 
   // Do nothing if the player walks into a wall.
   if (maze.items[itemNewIndex] === itemTypes.WALL) return maze
@@ -104,7 +108,7 @@ function moveItem(maze, itemCurrentIndex, itemType, direction, onMove, piet) {
   let updatedMaze = createCopy(maze)
 
   // Set the item type of the previous item.
-  updatedMaze.items[itemCurrentIndex] = piet
+  updatedMaze.items[itemCurrentIndex] = replaceByItemType
 
   // Set the item type of the new item.
   updatedMaze.items[itemNewIndex] = itemType
@@ -197,46 +201,50 @@ function getMazeFromTemplate(mazeTemplate) {
   return maze
 }
 
-function determineNewIndex(currentIndex, itemsPerRow, direction) {
+function determineNewIndex(currentIndex, maze, direction) {
+  let newIndex
   switch (direction) {
     case directions.UP:
-      return currentIndex - itemsPerRow
+      newIndex = currentIndex - maze.itemsPerRow
+      break
     case directions.LEFT:
-      return currentIndex - 1
+      newIndex = currentIndex - 1
+      break
     case directions.RIGHT:
-      return currentIndex + 1
+      newIndex = currentIndex + 1
+      break
     case directions.DOWN:
-      return currentIndex + itemsPerRow
+      newIndex = currentIndex + maze.itemsPerRow
+      break
     default:
-      return -1
+      newIndex = -1
+      break
   }
+
+  // Do not return the new index if it's outside of the maze.
+  if (newIndex < 0 || newIndex > maze.items.length - 1) newIndex = -1
+
+  return newIndex
 }
 
 function getPossibleGhostDirections(maze, index, previousDirection) {
   let possibleDirections = []
 
-  //TODO Refactor this
+  //TODO Refactor this shite
 
   const canMoveTo = (maze, index) =>
-    maze.items[index] === itemTypes.DOT ||
-    maze.items[index] === itemTypes.EMPTY ||
-    maze.items[index] === itemTypes.FOOD ||
-    maze.items[index] === itemTypes.EXIT
+    index !== -1 && maze.items[index] !== itemTypes.WALL
 
-  const upIndex = determineNewIndex(index, maze.itemsPerRow, directions.UP)
+  const upIndex = determineNewIndex(index, maze, directions.UP)
   if (canMoveTo(maze, upIndex)) possibleDirections.push(directions.UP)
 
-  const downIndex = determineNewIndex(index, maze.itemsPerRow, directions.DOWN)
+  const downIndex = determineNewIndex(index, maze, directions.DOWN)
   if (canMoveTo(maze, downIndex)) possibleDirections.push(directions.DOWN)
 
-  const leftIndex = determineNewIndex(index, maze.itemsPerRow, directions.LEFT)
+  const leftIndex = determineNewIndex(index, maze, directions.LEFT)
   if (canMoveTo(maze, leftIndex)) possibleDirections.push(directions.LEFT)
 
-  const rightIndex = determineNewIndex(
-    index,
-    maze.itemsPerRow,
-    directions.RIGHT,
-  )
+  const rightIndex = determineNewIndex(index, maze, directions.RIGHT)
   if (canMoveTo(maze, rightIndex)) possibleDirections.push(directions.RIGHT)
 
   if (previousDirection) {
