@@ -3,7 +3,7 @@ import GameOver from './GameOver'
 import Buttons from './Buttons'
 import { useKeyPress } from './useKeyPress'
 import { useInterval } from './useInterval'
-import { getMaze, itemTypes, directions, movePlayer } from './functions'
+import { getMaze, itemTypes, directions, updateMaze } from './functions'
 
 const initialState = {
   getMaze,
@@ -35,7 +35,7 @@ export default function App() {
   }, [maze])
 
   function moveToDirection() {
-    const updatedMaze = movePlayer(maze, direction, updateScore)
+    const updatedMaze = updateMaze(maze, direction, updateScore)
     if (updatedMaze !== maze) setMaze(updatedMaze)
   }
 
@@ -95,6 +95,7 @@ function Item({ item, x, y }) {
   if (item === itemTypes.DOT) return <Dot x={x} y={y} />
   if (item === itemTypes.EXIT) return <Dot x={x} y={y} />
   if (item === itemTypes.FOOD) return <Food x={x} y={y} />
+  if (item === itemTypes.GHOST) return <Ghost x={x} y={y} />
   return null
 }
 
@@ -102,6 +103,10 @@ function Player({ x, y }) {
   return (
     <circle cx={x + itemSize / 2} cy={y + itemSize / 2} r={7} fill="yellow" />
   )
+}
+
+function Ghost({ x, y }) {
+  return <circle cx={x + itemSize / 2} cy={y + itemSize / 2} r={7} fill="red" />
 }
 
 function Wall({ x, y }) {
