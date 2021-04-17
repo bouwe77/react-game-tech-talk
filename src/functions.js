@@ -24,20 +24,7 @@ const createMaze = pipe(getMazeFromTemplate, addFood)
 
 export const getMaze = () => createMaze(mazeTemplates.test)
 
-function getMazeFromTemplate(mazeTemplate) {
-  const items = mazeTemplate.items.replace(/\s/g, '').split('')
-
-  const maze = {
-    reachedExit: false,
-    items,
-    numberOfRows: mazeTemplate.numberOfRows,
-    itemsPerRow: mazeTemplate.itemsPerRow,
-  }
-
-  return maze
-}
-
-export function movePlayer(maze, direction, onMove = null) {
+export const movePlayer = (maze, direction, onMove = null) => {
   // Do nothing if the player had already reached the exit.
   if (maze.reachedExit) return maze
 
@@ -80,9 +67,10 @@ export function movePlayer(maze, direction, onMove = null) {
   return updatedMaze
 }
 
-export function addFood(maze) {
+function addFood(maze) {
   const currentFoods = maze.items.filter((item) => item === itemTypes.FOOD)
     .length
+
   if (currentFoods === howManyFood) return maze
 
   const number = howManyFood - currentFoods
@@ -107,6 +95,19 @@ export function addFood(maze) {
   })
 
   return updatedMaze
+}
+
+function getMazeFromTemplate(mazeTemplate) {
+  const items = mazeTemplate.items.replace(/\s/g, '').split('')
+
+  const maze = {
+    reachedExit: false,
+    items,
+    numberOfRows: mazeTemplate.numberOfRows,
+    itemsPerRow: mazeTemplate.itemsPerRow,
+  }
+
+  return maze
 }
 
 function determineNewIndex(currentIndex, itemsPerRow, direction) {

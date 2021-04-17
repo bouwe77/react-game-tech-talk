@@ -59,19 +59,7 @@ export default function App() {
 
       <Score score={score} />
 
-      <Maze
-        width={maze.itemsPerRow * itemSize}
-        height={maze.numberOfRows * itemSize}
-      >
-        {maze.items.reduce((itemComponents, item, index) => {
-          const x = (index % maze.itemsPerRow) * itemSize
-          const y = Math.floor(index / maze.itemsPerRow) * itemSize
-          return [
-            ...itemComponents,
-            <Item key={`${item}-${x}-${y}`} item={item} x={x} y={y} />,
-          ]
-        }, [])}
-      </Maze>
+      <Maze maze={maze} />
 
       <Buttons
         buttonClicked={(direction) => setDirection(direction)}
@@ -81,11 +69,22 @@ export default function App() {
   )
 }
 
-function Maze({ width, height, children }) {
+function Maze({ maze }) {
+  const width = maze.itemsPerRow * itemSize
+  const height = maze.numberOfRows * itemSize
+
   return (
     <svg width={width} height={height}>
       <rect width={width} height={height} fill="black" />
-      {children}
+
+      {maze.items.reduce((itemComponents, item, index) => {
+        const x = (index % maze.itemsPerRow) * itemSize
+        const y = Math.floor(index / maze.itemsPerRow) * itemSize
+        return [
+          ...itemComponents,
+          <Item key={`${item}-${x}-${y}`} item={item} x={x} y={y} />,
+        ]
+      }, [])}
     </svg>
   )
 }
