@@ -1,5 +1,5 @@
 import React from 'react'
-import { directions } from './functions'
+import { directions } from '../../engine/constants'
 
 export default function Buttons({
   buttonClicked = () => {},

@@ -3,7 +3,11 @@ import GameOver from './GameOver'
 import Buttons from './Buttons'
 import { useKeyPress } from './useKeyPress'
 import { useInterval } from './useInterval'
-import { getMaze, itemTypes, directions, updateMaze } from './functions'
+import { createGetMaze } from '../../engine/mazes'
+import { itemTypes, directions } from '../../engine/constants'
+import { updateMaze } from '../../engine/functions'
+
+const getMaze = createGetMaze()
 
 const initialState = {
   getMaze,
@@ -52,9 +56,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h1>REPACTMAN</h1>
-
+    <>
       {maze.reachedExit && <GameOver score={score} resetGame={resetGame} />}
 
       <Score score={score} />
@@ -65,7 +67,7 @@ export default function App() {
         buttonClicked={(direction) => setDirection(direction)}
         disabled={maze.reachedExit}
       />
-    </div>
+    </>
   )
 }
 

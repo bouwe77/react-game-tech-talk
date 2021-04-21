@@ -1,29 +1,6 @@
-import { mazeTemplates } from './mazes'
+import { itemTypes, directions } from './constants'
 
 const howManyFood = 3
-
-export const directions = {
-  NONE: 'none',
-  UP: 'up',
-  DOWN: 'down',
-  LEFT: 'left',
-  RIGHT: 'right',
-}
-
-export const itemTypes = {
-  PLAYER: 'P',
-  WALL: 'X',
-  DOT: '.',
-  FOOD: 'F',
-  EXIT: 'E',
-  EMPTY: ' ',
-  GHOST: '@',
-}
-
-const pipe = (...fns) => (x) => fns.reduce((y, f) => f(y), x)
-const createMaze = pipe(getMazeFromTemplate, addFood)
-
-export const getMaze = () => createMaze(mazeTemplates.maze2)
 
 export const updateMaze = (maze, direction, onMove = null) => {
   // Do nothing if the player had already reached the exit.
@@ -37,6 +14,8 @@ export const updateMaze = (maze, direction, onMove = null) => {
 }
 
 function moveGhosts(maze) {
+  if (maze.ghosts.length === 0) return maze
+
   let updatedMaze = createCopy(maze)
 
   for (
@@ -131,43 +110,38 @@ function movePlayer(maze, direction, onMove) {
 
   const newPlayerIndex = updatedMaze.items.indexOf(itemTypes.PLAYER)
 
-  updatedMaze.reachedExit = newPlayerIndex === oldExitIndex
+  if (updatedMaze.dotsUntilFood > 0) {
+    if (maze.items[newPlayerIndex] === itemTypes.DOT) updatedMaze.dotsEaten++
 
-  // Add new food if the player ate food.
-  const ateFood = maze.items[newPlayerIndex] === itemTypes.FOOD
-  if (ateFood) updatedMaze = addFood(updatedMaze)
+    if (updatedMaze.dotsEaten % updatedMaze.dotsUntilFood === 0) {
+      updatedMaze = addFood(updatedMaze)
+      updatedMaze.dotsEaten = 0
+    }
+  }
+
+  updatedMaze.reachedExit = newPlayerIndex === oldExitIndex
 
   return updatedMaze
 }
 
-function addFood(maze) {
-  const currentFoods = maze.items.filter((item) => item === itemTypes.FOOD)
-    .length
-
-  if (currentFoods === howManyFood) return maze
-
-  const number = howManyFood - currentFoods
-
-  // Pick some random positions.
-  const randomPositions = getItemIndexes(maze.items, [
+export function addFood(maze) {
+  // Pick a random position.
+  const randomPosition = getItemIndexes(maze.items, [
     itemTypes.DOT,
     itemTypes.EMPTY,
   ])
+    //TODO Deze sort kan weg en dan gewoon een random index nummer bepalen:
     // the remaining index numbers are shuffled
-    .sort(() => Math.random() - Math.random())
-    // Pick the number of indexes we need.
-    .slice(0, number)
+    .sort(() => Math.random() - Math.random())[0]
 
-  // Create food on that positions.
+  // Create food on that position.
   const updatedMaze = createCopy(maze)
-  randomPositions.forEach((pos) => {
-    updatedMaze.items[pos] = itemTypes.FOOD
-  })
+  updatedMaze.items[randomPosition] = itemTypes.FOOD
 
   return updatedMaze
 }
 
-function getItemIndexes(items, itemTypes) {
+export function getItemIndexes(items, itemTypes) {
   return (
     items
       // map creates an array with the indexes of all items that are the given itemTypes and undefined for all other items.
@@ -175,30 +149,6 @@ function getItemIndexes(items, itemTypes) {
       // filter removes all undefined items, i.e. other items than the given itemTypes
       .filter((x) => x)
   )
-}
-
-function getMazeFromTemplate(mazeTemplate) {
-  const items = mazeTemplate.items.replace(/\s/g, '').split('')
-
-  const ghosts = getItemIndexes(items, [itemTypes.GHOST]).map(
-    (ghostMazeIndex) => {
-      return {
-        mazeIndex: ghostMazeIndex,
-        replacedItemType: null,
-        previousDirection: null,
-      }
-    },
-  )
-
-  const maze = {
-    reachedExit: false,
-    items,
-    numberOfRows: mazeTemplate.numberOfRows,
-    itemsPerRow: mazeTemplate.itemsPerRow,
-    ghosts,
-  }
-
-  return maze
 }
 
 function determineNewIndex(currentIndex, maze, direction) {
