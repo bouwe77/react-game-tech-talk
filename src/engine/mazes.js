@@ -2,7 +2,7 @@ import { itemTypes } from './constants'
 import { getItemIndexes } from './functions'
 
 export function createGetMaze(getMaze = fetchMaze) {
-  return function (level = 0) {
+  return function (level = 1) {
     let maze = getMaze(level)
 
     const ghostMazeIndexes = getItemIndexes(maze.items, [itemTypes.GHOST])
