@@ -1,12 +1,11 @@
 import { itemTypes, directions } from './constants'
 
 test('itemTypes have expected values', () => {
-  expect(Object.keys(itemTypes).length).toBe(7)
+  expect(Object.keys(itemTypes).length).toBe(6)
   expect(itemTypes.PLAYER).toBe('P')
   expect(itemTypes.WALL).toBe('X')
   expect(itemTypes.DOT).toBe('.')
   expect(itemTypes.FOOD).toBe('F')
-  expect(itemTypes.EXIT).toBe('E')
   expect(itemTypes.EMPTY).toBe(' ')
   expect(itemTypes.GHOST).toBe('@')
 })

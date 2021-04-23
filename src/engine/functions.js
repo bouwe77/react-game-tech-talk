@@ -1,12 +1,10 @@
 import { itemTypes, directions } from './constants'
 
-const howManyFood = 3
-
 export const updateMaze = (maze, direction, onMove = null) => {
-  // Do nothing if the player had already reached the exit.
-  if (maze.reachedExit) return maze
+  let updatedMaze = maze
 
-  let updatedMaze = movePlayer(maze, direction, onMove)
+  if (direction !== directions.NONE)
+    updatedMaze = movePlayer(maze, direction, onMove)
 
   updatedMaze = moveGhosts(updatedMaze)
 
@@ -16,15 +14,10 @@ export const updateMaze = (maze, direction, onMove = null) => {
 function moveGhosts(maze) {
   if (maze.ghosts.length === 0) return maze
 
-  let updatedMaze = createCopy(maze)
+  const ghostsIndex = 0 // because there is only one ghost supported at this moment
 
-  for (
-    let ghostsIndex = 0;
-    ghostsIndex < updatedMaze.ghosts.length;
-    ghostsIndex++
-  ) {
-    updatedMaze = moveGhost(updatedMaze, ghostsIndex)
-  }
+  let updatedMaze = createCopy(maze)
+  updatedMaze = moveGhost(updatedMaze, ghostsIndex)
 
   return updatedMaze
 }
@@ -32,6 +25,7 @@ function moveGhosts(maze) {
 function moveGhost(maze, ghostsIndex) {
   const ghost = maze.ghosts[ghostsIndex]
   const currentGhostMazeIndex = ghost.mazeIndex
+
   const possibleDirections = getPossibleGhostDirections(
     maze,
     currentGhostMazeIndex,
@@ -39,9 +33,6 @@ function moveGhost(maze, ghostsIndex) {
   )
   const direction = getRandom(possibleDirections)
   const onMove = () => {}
-
-  //TODO Bug: Ghost vervangt denk ik de EXIT door iets anders, zodat exitReached opeens true wordt?
-  //TODO Bovendien wordt de player ook vervangen, dat moet (nog) niet...
 
   const updatedMaze = moveItem(
     maze,
@@ -51,15 +42,18 @@ function moveGhost(maze, ghostsIndex) {
     onMove,
     ghost.replacedItemType || itemTypes.DOT,
   )
-
   const newMazeIndex = updatedMaze.items.indexOf(itemTypes.GHOST)
+
+  const replacedItemType = maze.items[newMazeIndex]
 
   updatedMaze.ghosts[ghostsIndex] = {
     ...updatedMaze.ghosts[ghostsIndex],
     mazeIndex: newMazeIndex,
-    replacedItemType: maze.items[newMazeIndex],
+    replacedItemType,
     previousDirection: direction,
   }
+
+  updatedMaze.gameOver = replacedItemType === itemTypes.PLAYER
 
   return updatedMaze
 }
@@ -97,7 +91,6 @@ function moveItem(
 
 function movePlayer(maze, direction, onMove) {
   const currentPlayerIndex = maze.items.indexOf(itemTypes.PLAYER)
-  const oldExitIndex = maze.items.indexOf(itemTypes.EXIT)
 
   let updatedMaze = moveItem(
     maze,
@@ -113,26 +106,26 @@ function movePlayer(maze, direction, onMove) {
   if (updatedMaze.dotsUntilFood > 0) {
     if (maze.items[newPlayerIndex] === itemTypes.DOT) updatedMaze.dotsEaten++
 
-    if (updatedMaze.dotsEaten % updatedMaze.dotsUntilFood === 0) {
+    if (
+      updatedMaze.dotsEaten > 0 &&
+      updatedMaze.dotsEaten % updatedMaze.dotsUntilFood === 0
+    ) {
       updatedMaze = addFood(updatedMaze)
       updatedMaze.dotsEaten = 0
     }
   }
-
-  updatedMaze.reachedExit = newPlayerIndex === oldExitIndex
 
   return updatedMaze
 }
 
 export function addFood(maze) {
   // Pick a random position.
-  const randomPosition = getItemIndexes(maze.items, [
+  const possiblePositions = getItemIndexes(maze.items, [
     itemTypes.DOT,
     itemTypes.EMPTY,
   ])
-    //TODO Deze sort kan weg en dan gewoon een random index nummer bepalen:
-    // the remaining index numbers are shuffled
-    .sort(() => Math.random() - Math.random())[0]
+  const randomPosition =
+    possiblePositions[(possiblePositions.length * Math.random()) | 0]
 
   // Create food on that position.
   const updatedMaze = createCopy(maze)

@@ -6,7 +6,7 @@ test("Try to go where you can't go", () => {
   // Arrange
   const getMazeTemplate = (level) => {
     return {
-      items: ['X', 'P', 'X', 'X', '.', 'X', 'X', 'E', 'X'],
+      items: ['X', 'P', 'X', 'X', '.', 'X', 'X', '.', 'X'],
       itemsPerRow: 3,
       numberOfRows: 3,
       dotsUntilFood: 0,
@@ -37,7 +37,7 @@ test("Try to go where you can't go", () => {
   // Assert
   expect(updatedMaze).toBe(maze)
 
-  // ====== Move down to the exit, and when reached, move down again, which shouldn't be possible because you can't exit the maze's boundaries. ======
+  // ====== Move down to the end, and when reached, move down again, which shouldn't be possible because you can't exit the maze's boundaries. ======
 
   // Act (move down)
   const updatedMaze1 = updateMaze(maze, 'down')
@@ -49,17 +49,17 @@ test("Try to go where you can't go", () => {
   // Assert the maze has been updated
   expect(updatedMaze2).not.toBe(updatedMaze1)
 
-  // Act (move down again, which should not be possible because we already reached the exit)
+  // Act (move down again, which should not be possible because that would mean we exit the maze)
   const notUpdatedMaze = updateMaze(updatedMaze2, 'down')
   // Assert the maze is NOT updated
   expect(notUpdatedMaze).toBe(updatedMaze2)
 })
 
-test('Walk straight to the exit in a very simple maze without ghosts', () => {
+test('Move in a very simple maze without ghosts', () => {
   // Arrange
   const getMazeTemplate = (level) => {
     return {
-      items: ['X', 'P', 'X', 'X', '.', 'X', 'X', 'E', 'X'],
+      items: ['X', 'P', 'X', 'X', '.', 'X', 'X', 'X', 'X'],
       itemsPerRow: 3,
       numberOfRows: 3,
       dotsUntilFood: 1, // Every time a dot is eaten, new food appears
@@ -73,7 +73,7 @@ test('Walk straight to the exit in a very simple maze without ghosts', () => {
   let actualItemType
   const onMove = (itemType) => (actualItemType = itemType)
 
-  // ====== 1st move down ======
+  // ====== move down ======
 
   // Act
   let updatedMaze = updateMaze(maze, 'down', onMove)
@@ -88,33 +88,12 @@ test('Walk straight to the exit in a very simple maze without ghosts', () => {
     'P',
     'X',
     'X',
-    'E',
+    'X',
     'X',
   ])
-  expect(updatedMaze.reachedExit).toBe(false)
-
-  // ====== 2nd move down, so we reach the exit ======
-
-  // Act
-  updatedMaze = updateMaze(updatedMaze, 'down', onMove)
-
-  // Assert
-  expect(actualItemType).toBe('E')
-  expect(updatedMaze.items).toEqual([
-    'X',
-    'F',
-    'X',
-    'X',
-    'F',
-    'X',
-    'X',
-    'P',
-    'X',
-  ])
-  expect(updatedMaze.reachedExit).toBe(true)
 })
 
-test('A bit more complex maze', () => {
+test('A bit more complex maze without ghosts', () => {
   // Arrange
   const getMazeTemplate = (level) => {
     return {
@@ -135,7 +114,7 @@ test('A bit more complex maze', () => {
         'X',
         'X',
         'X',
-        'E',
+        'X',
         'X',
       ],
       dotsUntilFood: 3, // Every time 3 dots are eaten, new food appears
@@ -146,7 +125,7 @@ test('A bit more complex maze', () => {
   const getMaze = createGetMaze(getMazeTemplate)
   const maze = getMaze(level)
 
-  const moves = ['down', 'down', 'right', 'down']
+  const moves = ['down', 'down', 'right']
 
   // Act
   let updatedMaze = maze
@@ -157,5 +136,77 @@ test('A bit more complex maze', () => {
   expect(updatedMaze.items.filter((i) => i === itemTypes.FOOD).length).toEqual(
     1,
   )
-  expect(updatedMaze.reachedExit).toBe(true)
+})
+
+test('One ghost, the player does not move, so game over', () => {
+  // Arrange
+  const getMazeTemplate = (level) => {
+    return {
+      items: ['X', 'P', 'X', 'X', '.', 'X', 'X', '@', 'X', 'X', 'X', 'X'],
+      itemsPerRow: 3,
+      numberOfRows: 4,
+      dotsUntilFood: 0, // no food for now
+      dotsEaten: 0,
+    }
+  }
+  const level = 0
+  const getMaze = createGetMaze(getMazeTemplate)
+  const maze = getMaze(level)
+
+  // Assert the initial maze
+  expect(maze.items).toEqual([
+    'X',
+    'P',
+    'X',
+    'X',
+    '.',
+    'X',
+    'X',
+    '@',
+    'X',
+    'X',
+    'X',
+    'X',
+  ])
+  expect(maze.gameOver).toBeFalsy()
+
+  // Act (do not move the player)
+  let updatedMaze = updateMaze(maze, 'none')
+
+  // Assert (the ghost has moved)
+  expect(updatedMaze.items).toEqual([
+    'X',
+    'P',
+    'X',
+    'X',
+    '@',
+    'X',
+    'X',
+    '.',
+    'X',
+    'X',
+    'X',
+    'X',
+  ])
+  expect(updatedMaze.gameOver).toBeFalsy()
+
+  // Act (do not move the player)
+  updatedMaze = updateMaze(updatedMaze, 'none')
+
+  // Assert (the ghost has replaced the player)
+  expect(updatedMaze.items).toEqual([
+    'X',
+    '@',
+    'X',
+    'X',
+    '.',
+    'X',
+    'X',
+    '.',
+    'X',
+    'X',
+    'X',
+    'X',
+  ])
+  expect(updatedMaze.gameOver).toBeTruthy()
 })

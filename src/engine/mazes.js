@@ -1,18 +1,56 @@
-export function createGetMaze(getMazeTemplate = fetchMazeTemplate) {
+import { itemTypes } from './constants'
+import { getItemIndexes } from './functions'
+
+export function createGetMaze(getMaze = fetchMaze) {
   return function (level = 0) {
-    let maze = getMazeTemplate(level)
-    maze = { ...maze, ghosts: [], reachedExit: false }
+    let maze = getMaze(level)
+
+    const ghostMazeIndexes = getItemIndexes(maze.items, [itemTypes.GHOST])
+    let ghosts = []
+    ghostMazeIndexes.forEach((ghostMazeIndex) => {
+      const ghost = {
+        mazeIndex: ghostMazeIndex,
+        replacedItemType: null,
+        previousDirection: null,
+      }
+      ghosts = [...ghosts, ghost]
+    })
+
+    maze = { ...maze, ghosts, gameOver: false }
+
     return maze
   }
 }
 
-export function fetchMazeTemplate(level) {
+export function fetchMaze(level) {
   const mazeTemplates = [
     {
-      items: ['X', 'P', 'X', 'X', '.', 'X', 'X', 'E', 'X'],
+      items: [
+        'X',
+        'P',
+        'X',
+        'X',
+        '.',
+        'X',
+        'X',
+        '.',
+        'X',
+        'X',
+        '.',
+        'X',
+        'X',
+        '.',
+        'X',
+        'X',
+        '@',
+        'X',
+        'X',
+        'X',
+        'X',
+      ],
       itemsPerRow: 3,
-      numberOfRows: 3,
-      dotsUntilFood: 1,
+      numberOfRows: 7,
+      dotsUntilFood: 10,
       dotsEaten: 0,
     },
     {
@@ -136,19 +174,19 @@ export function fetchMazeTemplate(level) {
         'X',
         '.',
         '.',
-        'E',
-        'X',
-        '.',
-        'X',
-        '.',
-        '.',
-        'X',
         'X',
         'X',
         '.',
         'X',
         '.',
         '.',
+        'X',
+        'X',
+        'X',
+        '.',
+        'X',
+        '.',
+        '.',
         '.',
         '.',
         '.',
@@ -157,13 +195,6 @@ export function fetchMazeTemplate(level) {
         '.',
         'X',
         'X',
-        'X',
-        '.',
-        'X',
-        'X',
-        '.',
-        'X',
-        '.',
         'X',
         '.',
         'X',
@@ -171,6 +202,13 @@ export function fetchMazeTemplate(level) {
         '.',
         'X',
         '.',
+        'X',
+        '.',
+        'X',
+        'X',
+        '.',
+        'X',
+        '@',
         'X',
         '.',
         '.',
@@ -421,7 +459,7 @@ export function fetchMazeTemplate(level) {
         'X',
         'X',
         'X',
-        'E',
+        'X',
         'X',
         'X',
         'X',
@@ -629,7 +667,7 @@ export function fetchMazeTemplate(level) {
         'X',
         'X',
         'X',
-        'E',
+        'X',
         'X',
         'X',
         'X',
@@ -1090,7 +1128,7 @@ export function fetchMazeTemplate(level) {
         'X',
         'X',
         'X',
-        'E',
+        'X',
         'X',
         'X',
         'X',

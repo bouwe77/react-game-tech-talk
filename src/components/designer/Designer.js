@@ -7,8 +7,6 @@ function validate(maze) {
       return 'Should have at least 3 items'
     case maze.items.filter((i) => i === itemTypes.PLAYER).length !== 1:
       return 'Should have 1 player'
-    case maze.items.filter((i) => i === itemTypes.EXIT).length !== 1:
-      return 'Should have 1 exit'
   }
 
   return null

@@ -30,21 +30,17 @@ export default function App() {
   useKeyPress('ArrowRight', () => setDirection(directions.RIGHT))
 
   useInterval(() => {
-    if (direction === directions.NONE) return
-    moveToDirection()
+    //if (direction === directions.NONE) return
+    const updatedMaze = updateMaze(maze, direction, updateScore)
+    if (updatedMaze !== maze) setMaze(updatedMaze)
   }, interval)
 
   useEffect(() => {
-    if (maze.reachedExit) setInterval(null)
+    if (maze.gameOver) setInterval(null)
   }, [maze])
 
-  function moveToDirection() {
-    const updatedMaze = updateMaze(maze, direction, updateScore)
-    if (updatedMaze !== maze) setMaze(updatedMaze)
-  }
-
   function updateScore(item) {
-    if (item === itemTypes.DOT || item === itemTypes.EXIT) setScore(score + 1)
+    if (item === itemTypes.DOT) setScore(score + 1)
     if (item === itemTypes.FOOD) setScore(score + 10)
   }
 
@@ -57,16 +53,13 @@ export default function App() {
 
   return (
     <>
-      {maze.reachedExit && <GameOver score={score} resetGame={resetGame} />}
+      {maze.gameOver && <GameOver score={score} resetGame={resetGame} />}
 
       <Score score={score} />
 
       <Maze maze={maze} />
 
-      <Buttons
-        buttonClicked={(direction) => setDirection(direction)}
-        disabled={maze.reachedExit}
-      />
+      <Buttons buttonClicked={(direction) => setDirection(direction)} />
     </>
   )
 }
@@ -95,7 +88,6 @@ function Item({ item, x, y }) {
   if (item === itemTypes.WALL) return <Wall x={x} y={y} />
   if (item === itemTypes.PLAYER) return <Player x={x} y={y} />
   if (item === itemTypes.DOT) return <Dot x={x} y={y} />
-  if (item === itemTypes.EXIT) return <Dot x={x} y={y} />
   if (item === itemTypes.FOOD) return <Food x={x} y={y} />
   if (item === itemTypes.GHOST) return <Ghost x={x} y={y} />
   return null

@@ -11,7 +11,6 @@ export const itemTypes = {
   WALL: 'X',
   DOT: '.',
   FOOD: 'F',
-  EXIT: 'E',
   EMPTY: ' ',
   GHOST: '@',
 }

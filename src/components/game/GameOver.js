@@ -3,9 +3,9 @@ import React from 'react'
 export default function GameOver({ score = 0, resetGame = () => {} }) {
   return (
     <Modal>
-      <h3>YES!!!</h3>
+      <h3>GAME OVER...</h3>
       <p>
-        You scored {score} points, good job!
+        You scored {score} points!
         <br />
         <br />
         <button autoFocus onClick={resetGame}>
