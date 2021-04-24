@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import GameOver from './GameOver'
+import GameWon from './GameWon'
 import Buttons from './Buttons'
 import { useKeyPress } from './useKeyPress'
 import { useInterval } from './useInterval'
 import { createGetMaze } from '../../engine/mazes'
-import { itemTypes, directions } from '../../engine/constants'
+import { itemTypes, directions, gameStatuses } from '../../engine/constants'
 import { updateMaze } from '../../engine/functions'
 
 const getMaze = createGetMaze()
@@ -36,7 +37,7 @@ export default function App() {
   }, interval)
 
   useEffect(() => {
-    if (maze.gameOver) setInterval(null)
+    if (maze.gameStatus === gameStatuses.GAMEOVER) setInterval(null)
   }, [maze])
 
   function updateScore(item) {
@@ -53,7 +54,13 @@ export default function App() {
 
   return (
     <>
-      {maze.gameOver && <GameOver score={score} resetGame={resetGame} />}
+      {maze.gameStatus === gameStatuses.GAMEOVER && (
+        <GameOver score={score} resetGame={resetGame} />
+      )}
+
+      {maze.gameStatus === gameStatuses.WON && (
+        <GameWon score={score} resetGame={resetGame} />
+      )}
 
       <Score score={score} />
 

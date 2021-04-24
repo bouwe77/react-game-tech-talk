@@ -14,3 +14,8 @@ export const itemTypes = {
   EMPTY: ' ',
   GHOST: '@',
 }
+
+export const gameStatuses = {
+  GAMEOVER: 'gameover',
+  WON: 'won',
+}

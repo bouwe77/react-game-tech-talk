@@ -91,6 +91,28 @@ test('Move in a very simple maze without ghosts', () => {
     'X',
     'X',
   ])
+  //TODO expect(updatedMaze.gameStatus).toEqual(' EEN STATUS WAARAAN JE KUNT ZIEN DAT DE GAME NOG LOOPT')
+
+  // ====== move up to eat the food ======
+
+  // Act
+  updatedMaze = updateMaze(updatedMaze, 'up', onMove)
+
+  // Assert
+  expect(actualItemType).toBe('F')
+  expect(updatedMaze.items).toEqual([
+    'X',
+    'P',
+    'X',
+    'X',
+    ' ',
+    'X',
+    'X',
+    'X',
+    'X',
+  ])
+
+  expect(updatedMaze.gameStatus).toEqual('won')
 })
 
 test('A bit more complex maze without ghosts', () => {
@@ -125,7 +147,7 @@ test('A bit more complex maze without ghosts', () => {
   const getMaze = createGetMaze(getMazeTemplate)
   const maze = getMaze(level)
 
-  const moves = ['down', 'down', 'right']
+  let moves = ['down', 'down', 'right']
 
   // Act
   let updatedMaze = maze
@@ -136,6 +158,38 @@ test('A bit more complex maze without ghosts', () => {
   expect(updatedMaze.items.filter((i) => i === itemTypes.FOOD).length).toEqual(
     1,
   )
+
+  // Act (walk through the whole maze to make sure the food is eaten)
+  moves = ['left', 'up', 'right', 'left', 'up']
+
+  // Act
+  moves.forEach((move) => (updatedMaze = updateMaze(updatedMaze, move)))
+
+  // Assert
+  expect(updatedMaze.items.filter((i) => i === itemTypes.FOOD).length).toEqual(
+    0,
+  )
+
+  expect(updatedMaze.items).toEqual([
+    'X',
+    'P',
+    'X',
+    'X',
+    'X',
+    ' ',
+    ' ',
+    'X',
+    'X',
+    ' ',
+    ' ',
+    'X',
+    'X',
+    'X',
+    'X',
+    'X',
+  ])
+
+  expect(updatedMaze.gameStatus).toEqual('won')
 })
 
 test('One ghost, the player does not move, so game over', () => {
@@ -168,7 +222,7 @@ test('One ghost, the player does not move, so game over', () => {
     'X',
     'X',
   ])
-  expect(maze.gameOver).toBeFalsy()
+  //  expect(maze.gameStatus).not.toEqual('gameover')
 
   // Act (do not move the player)
   let updatedMaze = updateMaze(maze, 'none')
@@ -188,7 +242,7 @@ test('One ghost, the player does not move, so game over', () => {
     'X',
     'X',
   ])
-  expect(updatedMaze.gameOver).toBeFalsy()
+  expect(maze.gameStatus).not.toEqual('gameover')
 
   // Act (do not move the player)
   updatedMaze = updateMaze(updatedMaze, 'none')
@@ -208,5 +262,5 @@ test('One ghost, the player does not move, so game over', () => {
     'X',
     'X',
   ])
-  expect(updatedMaze.gameOver).toBeTruthy()
+  expect(updatedMaze.gameStatus).toEqual('gameover')
 })

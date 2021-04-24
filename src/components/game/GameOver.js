@@ -16,7 +16,7 @@ export default function GameOver({ score = 0, resetGame = () => {} }) {
   )
 }
 
-const Modal = ({ children }) => {
+export const Modal = ({ children }) => {
   return (
     <div className="modal display-block">
       <section className="modal-main">{children}</section>

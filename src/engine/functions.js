@@ -1,4 +1,4 @@
-import { itemTypes, directions } from './constants'
+import { itemTypes, directions, gameStatuses } from './constants'
 
 export const updateMaze = (maze, direction, onMove = null) => {
   let updatedMaze = maze
@@ -7,6 +7,13 @@ export const updateMaze = (maze, direction, onMove = null) => {
     updatedMaze = movePlayer(maze, direction, onMove)
 
   updatedMaze = moveGhosts(updatedMaze)
+
+  if (
+    !updatedMaze.gameStatus &&
+    getItemIndexes(updatedMaze.items, [itemTypes.DOT, itemTypes.FOOD])
+      .length === 0
+  )
+    updatedMaze.gameStatus = gameStatuses.WON
 
   return updatedMaze
 }
@@ -53,7 +60,8 @@ function moveGhost(maze, ghostsIndex) {
     previousDirection: direction,
   }
 
-  updatedMaze.gameOver = replacedItemType === itemTypes.PLAYER
+  if (replacedItemType === itemTypes.PLAYER)
+    updatedMaze.gameStatus = gameStatuses.GAMEOVER
 
   return updatedMaze
 }

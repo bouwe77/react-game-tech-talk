@@ -16,7 +16,7 @@ export function createGetMaze(getMaze = fetchMaze) {
       ghosts = [...ghosts, ghost]
     })
 
-    maze = { ...maze, ghosts, gameOver: false }
+    maze = { ...maze, ghosts, gameStatus: null }
 
     return maze
   }
@@ -42,7 +42,7 @@ export function fetchMaze(level) {
         '.',
         'X',
         'X',
-        '@',
+        '.',
         'X',
         'X',
         'X',
