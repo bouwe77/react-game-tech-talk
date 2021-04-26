@@ -94,7 +94,7 @@ test('Move in a very simple maze without ghosts', () => {
     'X',
     'X',
   ])
-  //TODO expect(updatedMaze.gameStatus).toEqual(' EEN STATUS WAARAAN JE KUNT ZIEN DAT DE GAME NOG LOOPT')
+  //TODO expect(updatedMaze.game.status).toEqual(' EEN STATUS WAARAAN JE KUNT ZIEN DAT DE GAME NOG LOOPT')
 
   // ====== move up to eat the food ======
 
@@ -115,7 +115,8 @@ test('Move in a very simple maze without ghosts', () => {
     'X',
   ])
 
-  expect(updatedMaze.gameStatus).toEqual('won')
+  expect(updatedMaze.game.status).toEqual('won')
+  expect(updatedMaze.game.points).toEqual(11)
 })
 
 test('A bit more complex maze without ghosts', () => {
@@ -148,7 +149,7 @@ test('A bit more complex maze without ghosts', () => {
   }
   const level = 0
   const getMaze = createGetMaze(getMazeTemplate)
-  const maze = getMaze(level)
+  const maze = getMaze(level, 10, 100)
 
   let moves = ['down', 'down', 'right']
 
@@ -192,7 +193,8 @@ test('A bit more complex maze without ghosts', () => {
     'X',
   ])
 
-  expect(updatedMaze.gameStatus).toEqual('won')
+  expect(updatedMaze.game.status).toEqual('won')
+  expect(updatedMaze.game.points).toEqual(140)
 })
 
 test('When a ghost encounters a player: Game over', () => {
@@ -225,7 +227,7 @@ test('When a ghost encounters a player: Game over', () => {
     'X',
     'X',
   ])
-  expect(maze.gameStatus).not.toEqual('gameover')
+  expect(maze.game.status).not.toEqual('gameover')
 
   // Act (do not move the player)
   let updatedMaze = updateMaze(maze, 'none')
@@ -245,7 +247,7 @@ test('When a ghost encounters a player: Game over', () => {
     'X',
     'X',
   ])
-  expect(updatedMaze.gameStatus).not.toEqual('gameover')
+  expect(updatedMaze.game.status).not.toEqual('gameover')
 
   // Act (do not move the player)
   updatedMaze = updateMaze(updatedMaze, 'none')
@@ -265,7 +267,7 @@ test('When a ghost encounters a player: Game over', () => {
     'X',
     'X',
   ])
-  expect(updatedMaze.gameStatus).toEqual('gameover')
+  expect(updatedMaze.game.status).toEqual('gameover')
 })
 
 test('When a player encounters a ghost: Game over', () => {
@@ -304,7 +306,7 @@ test('When a player encounters a ghost: Game over', () => {
     'X',
   ])
 
-  expect(updatedMaze.gameStatus).toEqual('gameover')
+  expect(updatedMaze.game.status).toEqual('gameover')
 })
 
 test('A ghost should not eat food', () => {

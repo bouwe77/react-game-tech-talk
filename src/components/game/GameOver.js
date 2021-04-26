@@ -1,9 +1,20 @@
 import React from 'react'
+import { gameStatuses } from '../../engine/constants'
 
-export default function GameOver({ score = 0, resetGame = () => {} }) {
+export default function GameOver({
+  score = 0,
+  gameStatus,
+  resetGame = () => {},
+}) {
   return (
     <Modal>
-      <h3>GAME OVER...</h3>
+      <h3>
+        {gameStatus === gameStatuses.GAMEOVER ? (
+          <>GAME OVER...</>
+        ) : (
+          <>YESSS!!!</>
+        )}
+      </h3>
       <p>
         You scored {score} points!
         <br />

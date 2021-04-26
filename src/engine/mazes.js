@@ -2,7 +2,17 @@ import { itemTypes } from './constants'
 import { getItemIndexes } from './functions'
 
 export function createGetMaze(getMaze = fetchMaze) {
-  return function (level = 1) {
+  return function (level = 1, pointsPerDot = 1, pointsPerFood = 10) {
+    if (
+      isNaN(level) ||
+      level < 0 ||
+      isNaN(pointsPerDot) ||
+      isNaN(pointsPerFood)
+    )
+      throw new Error(
+        'Please supply numbers for level, pointsPerDot and pointsPerFood',
+      )
+
     let maze = getMaze(level)
 
     let ghosts = {}
@@ -15,7 +25,17 @@ export function createGetMaze(getMaze = fetchMaze) {
       }
     }
 
-    maze = { ...maze, ghosts, replacedItems: {}, gameStatus: null }
+    maze = {
+      ...maze,
+      ghosts,
+      replacedItems: {},
+      game: {
+        status: null,
+        points: 0,
+      },
+      pointsPerDot,
+      pointsPerFood,
+    }
 
     return maze
   }

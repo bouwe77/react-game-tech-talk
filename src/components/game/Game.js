@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import GameOver from './GameOver'
-import GameWon from './GameWon'
 import Buttons from './Buttons'
 import { useKeyPress } from './useKeyPress'
 import { useInterval } from './useInterval'
@@ -12,9 +11,8 @@ const getMaze = createGetMaze()
 const updateMaze = createUpdateMaze()
 
 const initialState = {
-  getMaze,
+  getMaze: () => getMaze(1),
   direction: directions.NONE,
-  score: 0,
   interval: 400,
 }
 
@@ -23,8 +21,8 @@ const itemSize = 20
 export default function App() {
   const [maze, setMaze] = useState(initialState.getMaze)
   const [direction, setDirection] = useState(initialState.direction)
-  const [score, setScore] = useState(initialState.score)
   const [interval, setInterval] = useState(initialState.interval)
+  const score = maze.game.points
 
   useKeyPress('ArrowUp', () => setDirection(directions.UP))
   useKeyPress('ArrowDown', () => setDirection(directions.DOWN))
@@ -32,34 +30,30 @@ export default function App() {
   useKeyPress('ArrowRight', () => setDirection(directions.RIGHT))
 
   useInterval(() => {
-    const updatedMaze = updateMaze(maze, direction, updateScore)
+    const updatedMaze = updateMaze(maze, direction)
     if (updatedMaze !== maze) setMaze(updatedMaze)
     if (
-      [gameStatuses.GAMEOVER, gameStatuses.WON].includes(updatedMaze.gameStatus)
+      [gameStatuses.GAMEOVER, gameStatuses.WON].includes(
+        updatedMaze.game.status,
+      )
     )
       setInterval(null)
   }, interval)
 
-  function updateScore(item) {
-    if (item === itemTypes.DOT) setScore(score + 1)
-    if (item === itemTypes.FOOD) setScore(score + 10)
-  }
-
   function resetGame() {
     setMaze(initialState.getMaze())
     setDirection(initialState.direction)
-    setScore(initialState.score)
     setInterval(initialState.interval)
   }
 
   return (
     <>
-      {maze.gameStatus === gameStatuses.GAMEOVER && (
-        <GameOver score={score} resetGame={resetGame} />
-      )}
-
-      {maze.gameStatus === gameStatuses.WON && (
-        <GameWon score={score} resetGame={resetGame} />
+      {!!maze.game.status && (
+        <GameOver
+          score={score}
+          gameStatus={maze.game.status}
+          resetGame={resetGame}
+        />
       )}
 
       <Score score={score} />

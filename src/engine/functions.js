@@ -10,12 +10,12 @@ export const createUpdateMaze = (
     if (direction !== directions.NONE)
       updatedMaze = movePlayer(maze, direction, onMove, addFood)
 
-    if (updatedMaze.gameStatus === gameStatuses.GAMEOVER) return updatedMaze
+    if (updatedMaze.game.status === gameStatuses.GAMEOVER) return updatedMaze
 
     updatedMaze = moveGhosts(updatedMaze, getGhostDirection)
 
     if (
-      !updatedMaze.gameStatus &&
+      !updatedMaze.game.status &&
       getItemIndexes(updatedMaze.items, [itemTypes.DOT, itemTypes.FOOD])
         .length === 0 &&
       getItemIndexes(Object.values(updatedMaze.replacedItems), [
@@ -23,7 +23,7 @@ export const createUpdateMaze = (
         itemTypes.FOOD,
       ]).length === 0
     )
-      updatedMaze.gameStatus = gameStatuses.WON
+      updatedMaze.game.status = gameStatuses.WON
 
     return updatedMaze
   }
@@ -87,7 +87,7 @@ function moveGhost(maze, currentGhostIndex, previousDirection, getDirection) {
   delete updatedMaze.ghosts[currentGhostIndex]
 
   if (replacedItem === itemTypes.PLAYER)
-    updatedMaze.gameStatus = gameStatuses.GAMEOVER
+    updatedMaze.game.status = gameStatuses.GAMEOVER
 
   return updatedMaze
 }
@@ -119,12 +119,17 @@ function movePlayer(maze, direction, onMove, addFood) {
   // Set the item type of the new item.
   if (replacedItem === itemTypes.GHOST) {
     updatedMaze.items[newPlayerIndex] = itemTypes.GHOST
-    updatedMaze.gameStatus = gameStatuses.GAMEOVER
+    updatedMaze.game.status = gameStatuses.GAMEOVER
     return updatedMaze
   }
 
   updatedMaze.replacedItems[newPlayerIndex] = itemTypes.EMPTY
   updatedMaze.items[newPlayerIndex] = itemTypes.PLAYER
+
+  if (replacedItem === itemTypes.DOT)
+    updatedMaze.game.points += updatedMaze.pointsPerDot
+  if (replacedItem === itemTypes.FOOD)
+    updatedMaze.game.points += updatedMaze.pointsPerFood
 
   if (updatedMaze.dotsUntilFood > 0) {
     if (replacedItem === itemTypes.DOT) updatedMaze.dotsEaten++
