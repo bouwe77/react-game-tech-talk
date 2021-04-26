@@ -56,7 +56,7 @@ export default function App() {
         />
       )}
 
-      <Score score={score} />
+      <GameInfo game={maze.game} />
 
       <Maze maze={maze} />
 
@@ -137,6 +137,10 @@ function Food({ x, y }) {
   )
 }
 
-function Score({ score }) {
-  return <div className="score">score: {score}</div>
+function GameInfo({ game }) {
+  return (
+    <div className="score">
+      [level {game.level}] [score {game.points}]
+    </div>
+  )
 }

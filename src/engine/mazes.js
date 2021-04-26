@@ -3,15 +3,7 @@ import { getItemIndexes } from './functions'
 
 export function createGetMaze(getMaze = fetchMaze) {
   return function (level = 1, pointsPerDot = 1, pointsPerFood = 10) {
-    if (
-      isNaN(level) ||
-      level < 0 ||
-      isNaN(pointsPerDot) ||
-      isNaN(pointsPerFood)
-    )
-      throw new Error(
-        'Please supply numbers for level, pointsPerDot and pointsPerFood',
-      )
+    validate(level, pointsPerDot, pointsPerFood)
 
     let maze = getMaze(level)
 
@@ -32,6 +24,7 @@ export function createGetMaze(getMaze = fetchMaze) {
       game: {
         status: null,
         points: 0,
+        level,
       },
       pointsPerDot,
       pointsPerFood,
@@ -39,6 +32,13 @@ export function createGetMaze(getMaze = fetchMaze) {
 
     return maze
   }
+}
+
+function validate(level, pointsPerDot, pointsPerFood) {
+  if (isNaN(level) || level < 0 || isNaN(pointsPerDot) || isNaN(pointsPerFood))
+    throw new Error(
+      'Please supply valid numbers for level, pointsPerDot and pointsPerFood',
+    )
 }
 
 export function fetchMaze(level) {

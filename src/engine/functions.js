@@ -4,11 +4,11 @@ export const createUpdateMaze = (
   getGhostDirection = (directions) => getRandomFromArray(directions),
   addFood = (maze) => addRandomFood(maze, getRandomFromArray),
 ) => {
-  return function updateMaze(maze, direction, onMove = null) {
+  return function updateMaze(maze, direction) {
     let updatedMaze = maze
 
     if (direction !== directions.NONE)
-      updatedMaze = movePlayer(maze, direction, onMove, addFood)
+      updatedMaze = movePlayer(maze, direction, addFood)
 
     if (updatedMaze.game.status === gameStatuses.GAMEOVER) return updatedMaze
 
@@ -32,7 +32,7 @@ export const createUpdateMaze = (
 function moveGhosts(maze, getDirection) {
   if (Object.keys(maze.ghosts).length === 0) return maze
 
-  let updatedMaze = createCopy(maze)
+  let updatedMaze = maze
 
   for (let ghostIndex of Object.keys(maze.ghosts)) {
     updatedMaze = moveGhost(
@@ -60,10 +60,10 @@ function moveGhost(maze, currentGhostIndex, previousDirection, getDirection) {
 
   const newGhostIndex = determineNewIndex(currentGhostIndex, maze, direction)
 
-  const replacedItem = maze.items[newGhostIndex]
-
   // Do nothing if you can't go that way.
   if (newGhostIndex === -1) return maze
+
+  const replacedItem = maze.items[newGhostIndex]
 
   // Do nothing if you walk into a wall.
   if (replacedItem === itemTypes.WALL) return maze
@@ -92,7 +92,7 @@ function moveGhost(maze, currentGhostIndex, previousDirection, getDirection) {
   return updatedMaze
 }
 
-function movePlayer(maze, direction, onMove, addFood) {
+function movePlayer(maze, direction, addFood) {
   const currentPlayerIndex = maze.items.indexOf(itemTypes.PLAYER)
 
   const newPlayerIndex = determineNewIndex(currentPlayerIndex, maze, direction)
@@ -105,9 +105,6 @@ function movePlayer(maze, direction, onMove, addFood) {
   // Do nothing if the player walks into a wall.
   if (replacedItem === itemTypes.WALL) return maze
 
-  // Call the onMove callback (if provided) and pass the item which the player will replace.
-  if (onMove) onMove(replacedItem)
-
   // Create a copy of the maze so we can make changes to it.
   let updatedMaze = createCopy(maze)
 
@@ -117,20 +114,23 @@ function movePlayer(maze, direction, onMove, addFood) {
   delete updatedMaze.replacedItems.currentPlayerIndex
 
   // Set the item type of the new item.
+  updatedMaze.replacedItems[newPlayerIndex] = itemTypes.EMPTY
+  updatedMaze.items[newPlayerIndex] = itemTypes.PLAYER
+
+  // If the player encountered a ghost the game is over.
   if (replacedItem === itemTypes.GHOST) {
     updatedMaze.items[newPlayerIndex] = itemTypes.GHOST
     updatedMaze.game.status = gameStatuses.GAMEOVER
     return updatedMaze
   }
 
-  updatedMaze.replacedItems[newPlayerIndex] = itemTypes.EMPTY
-  updatedMaze.items[newPlayerIndex] = itemTypes.PLAYER
-
+  // Update the points
   if (replacedItem === itemTypes.DOT)
     updatedMaze.game.points += updatedMaze.pointsPerDot
   if (replacedItem === itemTypes.FOOD)
     updatedMaze.game.points += updatedMaze.pointsPerFood
 
+  // Add food if necessary
   if (updatedMaze.dotsUntilFood > 0) {
     if (replacedItem === itemTypes.DOT) updatedMaze.dotsEaten++
 

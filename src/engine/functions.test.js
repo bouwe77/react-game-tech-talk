@@ -73,16 +73,12 @@ test('Move in a very simple maze without ghosts', () => {
   const getMaze = createGetMaze(getMazeTemplate)
   const maze = getMaze(level)
 
-  let actualItemType
-  const onMove = (itemType) => (actualItemType = itemType)
-
   // ====== move down ======
 
   // Act
-  let updatedMaze = updateMaze(maze, 'down', onMove)
+  let updatedMaze = updateMaze(maze, 'down')
 
   // Assert
-  expect(actualItemType).toBe('.')
   expect(updatedMaze.items).toEqual([
     'X',
     'F',
@@ -99,10 +95,9 @@ test('Move in a very simple maze without ghosts', () => {
   // ====== move up to eat the food ======
 
   // Act
-  updatedMaze = updateMaze(updatedMaze, 'up', onMove)
+  updatedMaze = updateMaze(updatedMaze, 'up')
 
   // Assert
-  expect(actualItemType).toBe('F')
   expect(updatedMaze.items).toEqual([
     'X',
     'P',

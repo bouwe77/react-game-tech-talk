@@ -13,7 +13,7 @@ export default function App() {
       <div style={{ textAlign: 'center' }}>
         {playGame ? (
           <>
-            <h1>REPACTMAN</h1>
+            <h1>REpACTman</h1>
             <Game />
           </>
         ) : (
