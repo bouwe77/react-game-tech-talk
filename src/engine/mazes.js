@@ -5,18 +5,17 @@ export function createGetMaze(getMaze = fetchMaze) {
   return function (level = 1) {
     let maze = getMaze(level)
 
-    const ghostMazeIndexes = getItemIndexes(maze.items, [itemTypes.GHOST])
-    let ghosts = []
-    ghostMazeIndexes.forEach((ghostMazeIndex) => {
-      const ghost = {
-        mazeIndex: ghostMazeIndex,
-        replacedItemType: null,
-        previousDirection: null,
+    let ghosts = {}
+    for (let ghostIndex of getItemIndexes(maze.items, [itemTypes.GHOST])) {
+      ghosts = {
+        ...ghosts,
+        [ghostIndex]: {
+          previousDirection: null,
+        },
       }
-      ghosts = [...ghosts, ghost]
-    })
+    }
 
-    maze = { ...maze, ghosts, gameStatus: null }
+    maze = { ...maze, ghosts, replacedItems: {}, gameStatus: null }
 
     return maze
   }
@@ -208,28 +207,28 @@ export function fetchMaze(level) {
         'X',
         '.',
         'X',
+        '.',
+        'X',
+        '.',
+        '.',
+        '.',
+        'X',
+        'X',
+        'X',
+        '.',
+        '.',
+        '.',
+        '.',
+        '.',
+        '.',
+        '.',
+        '.',
+        '.',
+        '.',
+        '.',
         '@',
         'X',
-        '.',
-        '.',
-        '.',
-        'X',
-        'X',
-        'X',
-        '.',
-        '.',
-        '.',
-        '.',
-        '.',
-        '.',
-        '.',
-        '.',
-        '.',
-        '.',
-        '.',
-        '.',
-        'X',
-        '.',
+        '@',
         '.',
         'X',
         '.',

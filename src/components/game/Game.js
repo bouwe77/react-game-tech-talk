@@ -6,9 +6,10 @@ import { useKeyPress } from './useKeyPress'
 import { useInterval } from './useInterval'
 import { createGetMaze } from '../../engine/mazes'
 import { itemTypes, directions, gameStatuses } from '../../engine/constants'
-import { updateMaze } from '../../engine/functions'
+import { createUpdateMaze } from '../../engine/functions'
 
 const getMaze = createGetMaze()
+const updateMaze = createUpdateMaze()
 
 const initialState = {
   getMaze,
@@ -31,14 +32,13 @@ export default function App() {
   useKeyPress('ArrowRight', () => setDirection(directions.RIGHT))
 
   useInterval(() => {
-    //if (direction === directions.NONE) return
     const updatedMaze = updateMaze(maze, direction, updateScore)
     if (updatedMaze !== maze) setMaze(updatedMaze)
+    if (
+      [gameStatuses.GAMEOVER, gameStatuses.WON].includes(updatedMaze.gameStatus)
+    )
+      setInterval(null)
   }, interval)
-
-  useEffect(() => {
-    if (maze.gameStatus === gameStatuses.GAMEOVER) setInterval(null)
-  }, [maze])
 
   function updateScore(item) {
     if (item === itemTypes.DOT) setScore(score + 1)

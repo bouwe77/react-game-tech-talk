@@ -7,25 +7,17 @@ function validate(maze) {
       return 'Should have at least 3 items'
     case maze.items.filter((i) => i === itemTypes.PLAYER).length !== 1:
       return 'Should have 1 player'
+    case maze.items.filter((i) => i === itemTypes.DOT).length < 1:
+      return 'Should have at least 1 dot'
   }
 
   return null
 }
 
-const items = [
-  itemTypes.WALL,
-  itemTypes.WALL,
-  itemTypes.WALL,
-  itemTypes.WALL,
-  itemTypes.WALL,
-  itemTypes.WALL,
-  itemTypes.WALL,
-  itemTypes.WALL,
-  itemTypes.WALL,
-]
+const items = Array(200).fill(itemTypes.WALL)
 const initialMaze = {
-  numberOfRows: 3,
-  itemsPerRow: 3,
+  numberOfRows: 10,
+  itemsPerRow: 20,
   items,
 }
 

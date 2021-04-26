@@ -1,6 +1,9 @@
 import { createGetMaze } from './mazes'
-import { updateMaze } from './functions'
-import { itemTypes } from './constants'
+import { createUpdateMaze } from './functions'
+import { directions, itemTypes } from './constants'
+
+// Create the updateMaze function with default randomness.
+const updateMaze = createUpdateMaze()
 
 test("Try to go where you can't go", () => {
   // Arrange
@@ -192,7 +195,7 @@ test('A bit more complex maze without ghosts', () => {
   expect(updatedMaze.gameStatus).toEqual('won')
 })
 
-test('One ghost, the player does not move, so game over', () => {
+test('When a ghost encounters a player: Game over', () => {
   // Arrange
   const getMazeTemplate = (level) => {
     return {
@@ -222,7 +225,7 @@ test('One ghost, the player does not move, so game over', () => {
     'X',
     'X',
   ])
-  //  expect(maze.gameStatus).not.toEqual('gameover')
+  expect(maze.gameStatus).not.toEqual('gameover')
 
   // Act (do not move the player)
   let updatedMaze = updateMaze(maze, 'none')
@@ -242,7 +245,7 @@ test('One ghost, the player does not move, so game over', () => {
     'X',
     'X',
   ])
-  expect(maze.gameStatus).not.toEqual('gameover')
+  expect(updatedMaze.gameStatus).not.toEqual('gameover')
 
   // Act (do not move the player)
   updatedMaze = updateMaze(updatedMaze, 'none')
@@ -263,4 +266,187 @@ test('One ghost, the player does not move, so game over', () => {
     'X',
   ])
   expect(updatedMaze.gameStatus).toEqual('gameover')
+})
+
+test('When a player encounters a ghost: Game over', () => {
+  // The situation that a player steps on a ghost can only occur because
+  // the player is moved first, before the ghost moves.
+  // So this is testing an implementation detail, but I have seen this going wrong,
+  // so better safe than sorry...
+
+  // Arrange
+  const getMazeTemplate = (level) => {
+    return {
+      items: ['X', 'P', 'X', 'X', '@', 'X', 'X', 'X', 'X'],
+      itemsPerRow: 3,
+      numberOfRows: 3,
+      dotsUntilFood: 0, // No food
+      dotsEaten: 0,
+    }
+  }
+  const level = 0
+  const getMaze = createGetMaze(getMazeTemplate)
+  const maze = getMaze(level)
+
+  // Act
+  let updatedMaze = updateMaze(maze, 'down')
+
+  // Assert
+  expect(updatedMaze.items).toEqual([
+    'X',
+    ' ',
+    'X',
+    'X',
+    '@',
+    'X',
+    'X',
+    'X',
+    'X',
+  ])
+
+  expect(updatedMaze.gameStatus).toEqual('gameover')
+})
+
+test('A ghost should not eat food', () => {
+  // Arrange
+  const getMazeTemplate = (level) => {
+    return {
+      items: [
+        'X',
+        'P',
+        'X',
+        'X',
+        '.',
+        'X',
+        'X',
+        'F', // there is already some food
+        'X',
+        'X',
+        '@',
+        'X',
+        'X',
+        'X',
+        'X',
+      ],
+      itemsPerRow: 3,
+      numberOfRows: 5,
+      dotsUntilFood: 0, // No (new) food
+      dotsEaten: 0,
+    }
+  }
+  const level = 0
+  const getMaze = createGetMaze(getMazeTemplate)
+  const maze = getMaze(level)
+
+  const updateMazeGhostMovesUp = createUpdateMaze(() => 'up')
+
+  // Act (the player does not move, but the ghost moves up)
+  let updatedMaze = updateMazeGhostMovesUp(maze, 'none')
+
+  // Assert
+  expect(updatedMaze.items).toEqual([
+    'X',
+    'P',
+    'X',
+    'X',
+    '.',
+    'X',
+    'X',
+    '@', // the ghost "hides" the food
+    'X',
+    'X',
+    '.',
+    'X',
+    'X',
+    'X',
+    'X',
+  ])
+
+  // Act (the player still does not move, but the ghost moves up again)
+  updatedMaze = updateMazeGhostMovesUp(updatedMaze, 'none')
+
+  // Assert
+  expect(updatedMaze.items).toEqual([
+    'X',
+    'P',
+    'X',
+    'X',
+    '@',
+    'X',
+    'X',
+    'F', // the ghost moved and the food is back again
+    'X',
+    'X',
+    '.',
+    'X',
+    'X',
+    'X',
+    'X',
+  ])
+
+  // The test ends here: It does not matter here whether the player wins or not.
+})
+
+test('When two ghosts meet they each should go another way', () => {
+  // Arrange
+  const getMazeTemplate = (level) => {
+    return {
+      items: [
+        'X',
+        'P', // Notice this player can't move, but in this test also won't
+        'X',
+        'X',
+        'X',
+        'X',
+        'X',
+        '@', // This ghost can only move down
+        'X',
+        'X',
+        '.',
+        'X',
+        'X',
+        '.',
+        'X',
+        'X',
+        '@', // This ghost can only move up
+        'X',
+        'X',
+        'X',
+        'X',
+      ],
+      itemsPerRow: 3,
+      numberOfRows: 7,
+      dotsUntilFood: 0, // No (new) food
+      dotsEaten: 0,
+    }
+  }
+  const level = 0
+  const getMaze = createGetMaze(getMazeTemplate)
+  const maze = getMaze(level)
+
+  // Act (the player does not move, but the ghosts do)
+  let updatedMaze = updateMaze(maze, 'none')
+
+  // Assert
+  expect(updatedMaze.items.filter((i) => i === '@').length).toEqual(2)
+  expect(updatedMaze.items[10]).toEqual('@') // the upper ghost has no choice but to move down.
+  expect(updatedMaze.items[13]).toEqual('@') // the lower ghost has no choice but to move up.
+
+  // Act (the player does not move, but the ghosts do)
+  updatedMaze = updateMaze(updatedMaze, 'none')
+
+  // Assert
+  expect(updatedMaze.items.filter((i) => i === '@').length).toEqual(2)
+  expect(updatedMaze.items[7]).toEqual('@') // the upper ghost moved up again.
+  expect(updatedMaze.items[10]).toEqual('@') // because the upper ghost moved up again, the lower ghost has a choice and because it came from down it will move up now.
+
+  // Act (the player does not move, but the ghosts do)
+  updatedMaze = updateMaze(updatedMaze, 'none')
+
+  // Assert
+  expect(updatedMaze.items.filter((i) => i === '@').length).toEqual(2)
+  expect(updatedMaze.items[7]).toEqual('@') // the upper ghost can not move because it is enclosed by 3 walls and the other ghost.
+  expect(updatedMaze.items[13]).toEqual('@') // the lower ghost is enclosed by 2 walls and the upper ghost so it has to move down.
+
+  // etc... This test has proved ghosts will not go on top of each other but go back or another way if possible.
 })
