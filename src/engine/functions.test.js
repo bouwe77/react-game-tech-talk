@@ -1,6 +1,5 @@
 import { createGetMaze } from './mazes'
 import { createUpdateMaze } from './functions'
-import { directions, itemTypes } from './constants'
 
 // Create the updateMaze function with default randomness.
 const updateMaze = createUpdateMaze()
@@ -22,27 +21,22 @@ test("Try to go where you can't go", () => {
 
   // NOTE: .toBe on an object means check reference equality, it should be exactly the same object.
 
-  // ====== Move to the top, which shouldn't be possible because you can't exit the maze's boundaries. ======
-  // Act
+  // Act (Move to the top, which shouldn't be possible because you can't exit the maze's boundaries)
   let updatedMaze = updateMaze(maze, 'up')
   // Assert
   expect(updatedMaze).toBe(maze)
 
-  // ====== Move to the left, which shouldn't be possible because there is a wall... ======
-  // Act
+  // Act (Move to the left, which shouldn't be possible because there is a wall...)
   updatedMaze = updateMaze(maze, 'left')
   // Assert
   expect(updatedMaze).toBe(maze)
 
-  // ====== Move to the right, which shouldn't be possible because there is a wall... ======
-  // Act
+  // Act (Move to the right, which shouldn't be possible because there is a wall...)
   updatedMaze = updateMaze(maze, 'right')
   // Assert
   expect(updatedMaze).toBe(maze)
 
-  // ====== Move down to the end, and when reached, move down again, which shouldn't be possible because you can't exit the maze's boundaries. ======
-
-  // Act (move down)
+  // Act (Move down to the end)
   const updatedMaze1 = updateMaze(maze, 'down')
   // Assert the maze has been updated
   expect(updatedMaze1).not.toBe(maze)
@@ -62,9 +56,9 @@ test('Move in a very simple maze without ghosts', () => {
   // Arrange
   const getMazeTemplate = (level) => {
     return {
-      items: ['X', 'P', 'X', 'X', '.', 'X', 'X', 'X', 'X'],
+      items: ['X', 'P', 'X', 'X', '.', 'X', 'X', '.', 'X', 'X', 'X', 'X'],
       itemsPerRow: 3,
-      numberOfRows: 3,
+      numberOfRows: 4,
       dotsUntilFood: 1, // Every time a dot is eaten, new food appears
       dotsEaten: 0,
     }
@@ -73,9 +67,7 @@ test('Move in a very simple maze without ghosts', () => {
   const getMaze = createGetMaze(getMazeTemplate)
   const maze = getMaze(level)
 
-  // ====== move down ======
-
-  // Act
+  // Act (move down)
   let updatedMaze = updateMaze(maze, 'down')
 
   // Assert
@@ -87,14 +79,15 @@ test('Move in a very simple maze without ghosts', () => {
     'P',
     'X',
     'X',
+    '.',
+    'X',
+    'X',
     'X',
     'X',
   ])
   //TODO expect(updatedMaze.game.status).toEqual(' EEN STATUS WAARAAN JE KUNT ZIEN DAT DE GAME NOG LOOPT')
 
-  // ====== move up to eat the food ======
-
-  // Act
+  // Act (move up to eat the food)
   updatedMaze = updateMaze(updatedMaze, 'up')
 
   // Assert
@@ -106,12 +99,35 @@ test('Move in a very simple maze without ghosts', () => {
     ' ',
     'X',
     'X',
+    '.',
+    'X',
+    'X',
+    'X',
+    'X',
+  ])
+
+  // Act (move down twice to eat the final dot)
+  updatedMaze = updateMaze(updatedMaze, 'down')
+  updatedMaze = updateMaze(updatedMaze, 'down')
+
+  // Assert
+  expect(updatedMaze.items).toEqual([
+    'X',
+    ' ',
+    'X',
+    'X',
+    ' ',
+    'X',
+    'X',
+    'P',
+    'X',
+    'X',
     'X',
     'X',
   ])
 
   expect(updatedMaze.game.status).toEqual('won')
-  expect(updatedMaze.game.points).toEqual(11)
+  expect(updatedMaze.game.points).toEqual(12)
 })
 
 test('A bit more complex maze without ghosts', () => {
@@ -154,9 +170,7 @@ test('A bit more complex maze without ghosts', () => {
 
   // Assert
   expect(updatedMaze.dotsEaten).toEqual(0) // dotsEaten has been reset, because food was just added
-  expect(updatedMaze.items.filter((i) => i === itemTypes.FOOD).length).toEqual(
-    1,
-  )
+  expect(updatedMaze.items.filter((i) => i === 'F').length).toEqual(1)
 
   // Act (walk through the whole maze to make sure the food is eaten)
   moves = ['left', 'up', 'right', 'left', 'up']
@@ -165,9 +179,7 @@ test('A bit more complex maze without ghosts', () => {
   moves.forEach((move) => (updatedMaze = updateMaze(updatedMaze, move)))
 
   // Assert
-  expect(updatedMaze.items.filter((i) => i === itemTypes.FOOD).length).toEqual(
-    0,
-  )
+  expect(updatedMaze.items.filter((i) => i === 'F').length).toEqual(0)
 
   expect(updatedMaze.items).toEqual([
     'X',
