@@ -23,27 +23,27 @@ test("Try to go where you can't go", () => {
 
   // Act (Move to the top, which shouldn't be possible because you can't exit the maze's boundaries)
   let updatedMaze = updateMaze(maze, 'up')
-  // Assert
+  // Assert the maze is NOT updated
   expect(updatedMaze).toBe(maze)
 
   // Act (Move to the left, which shouldn't be possible because there is a wall...)
   updatedMaze = updateMaze(maze, 'left')
-  // Assert
+  // Assert the maze is NOT updated
   expect(updatedMaze).toBe(maze)
 
   // Act (Move to the right, which shouldn't be possible because there is a wall...)
   updatedMaze = updateMaze(maze, 'right')
-  // Assert
+  // Assert the maze is NOT updated
   expect(updatedMaze).toBe(maze)
 
   // Act (Move down to the end)
   const updatedMaze1 = updateMaze(maze, 'down')
-  // Assert the maze has been updated
+  // Assert the maze HAS been updated
   expect(updatedMaze1).not.toBe(maze)
 
   // Act (move down again so you reach the exit)
   const updatedMaze2 = updateMaze(updatedMaze1, 'down')
-  // Assert the maze has been updated
+  // Assert the maze HAS been updated
   expect(updatedMaze2).not.toBe(updatedMaze1)
 
   // Act (move down again, which should not be possible because that would mean we exit the maze)
