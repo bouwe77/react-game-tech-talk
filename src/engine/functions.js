@@ -5,9 +5,7 @@ export const createUpdateMaze = (
   addFood = (maze) => addRandomFood(maze, getRandomFromArray),
 ) => {
   return function updateMaze(maze, direction) {
-    let updatedMaze = maze
-
-    updatedMaze = movePlayer(maze, direction)
+    let updatedMaze = movePlayer(maze, direction)
 
     updatedMaze = determineGameStatus(updatedMaze)
 
@@ -25,51 +23,6 @@ export const createUpdateMaze = (
   }
 }
 
-function movePlayer(maze, direction) {
-  if (direction === directions.NONE) return maze
-
-  const currentPlayerIndex = maze.items.indexOf(itemTypes.PLAYER)
-
-  const newPlayerIndex = determineNewIndex(currentPlayerIndex, maze, direction)
-
-  // Do nothing if you can't go that way.
-  if (newPlayerIndex === -1) return maze
-
-  const replacedItem = maze.items[newPlayerIndex]
-
-  // Do nothing if the player walks into a wall.
-  if (replacedItem === itemTypes.WALL) return maze
-
-  // Create a copy of the maze so we can make changes to it.
-  let updatedMaze = createCopy(maze)
-
-  // Restore the item type of the previous item.
-  updatedMaze.items[currentPlayerIndex] =
-    updatedMaze.replacedItems[currentPlayerIndex] || itemTypes.EMPTY
-  delete updatedMaze.replacedItems.currentPlayerIndex
-
-  // Set the item type of the new item.
-  updatedMaze.replacedItems[newPlayerIndex] = itemTypes.EMPTY
-
-  if (
-    getItemIndexes(updatedMaze.items, [itemTypes.GHOST]).includes(
-      newPlayerIndex,
-    )
-  )
-    updatedMaze.items[newPlayerIndex] = itemTypes.GHOST
-  else updatedMaze.items[newPlayerIndex] = itemTypes.PLAYER
-
-  // Update the points
-  if (replacedItem === itemTypes.DOT) {
-    updatedMaze.dotsEaten++
-    updatedMaze.game.points += updatedMaze.pointsPerDot
-  }
-  if (replacedItem === itemTypes.FOOD)
-    updatedMaze.game.points += updatedMaze.pointsPerFood
-
-  return updatedMaze
-}
-
 function moveGhosts(maze, getDirection) {
   if (Object.keys(maze.ghosts).length === 0) return maze
 
@@ -82,38 +35,103 @@ function moveGhosts(maze, getDirection) {
   return updatedMaze
 }
 
-function moveGhost(maze, currentGhostIndex, getDirection) {
-  const direction = getDirection(maze, currentGhostIndex)
-
+function moveItem(
+  maze,
+  currentIndex,
+  direction,
+  getPreviousItemType,
+  getNewItemType,
+) {
   if (direction === directions.NONE) return maze
 
-  const newGhostIndex = determineNewIndex(currentGhostIndex, maze, direction)
+  const newIndex = determineNewIndex(currentIndex, maze, direction)
 
-  // Do nothing if you can't go that way.
-  if (newGhostIndex === -1) return maze
-
-  const replacedItem = maze.items[newGhostIndex]
-
-  // Do nothing if you walk into a wall.
-  if (replacedItem === itemTypes.WALL) return maze
+  const canMoveToThatIndex = canMoveTo(maze, maze.items[currentIndex], newIndex)
+  if (!canMoveToThatIndex) return maze
 
   // Create a copy of the maze so we can make changes to it.
   let updatedMaze = createCopy(maze)
 
   // Restore the item type of the previous item.
-  updatedMaze.items[currentGhostIndex] =
-    updatedMaze.replacedItems[currentGhostIndex] || itemTypes.DOT
-  delete updatedMaze.replacedItems.currentGhostIndex
+  const previousItem = getPreviousItemType()
+  updatedMaze.items[currentIndex] = previousItem
+  delete updatedMaze.replacedItems.currentIndex
+
+  // Remember the replaced item type so it can be restored the next time.
+  updatedMaze.replacedItems[newIndex] =
+    previousItem === itemTypes.EMPTY ? itemTypes.EMPTY : maze.items[newIndex]
 
   // Set the item type of the new item.
-  updatedMaze.items[newGhostIndex] = itemTypes.GHOST
-  updatedMaze.replacedItems[newGhostIndex] = replacedItem
+  updatedMaze.items[newIndex] = getNewItemType(maze, newIndex)
+
+  return updatedMaze
+}
+
+function movePlayer(maze, direction) {
+  if (direction === directions.NONE) return maze
+
+  const currentPlayerIndex = maze.items.indexOf(itemTypes.PLAYER)
+
+  const getPreviousItemType = () => itemTypes.EMPTY
+
+  const getNewItemType = (maze, index) => {
+    if (getItemIndexes(maze.items, [itemTypes.GHOST]).includes(index))
+      return itemTypes.GHOST
+    return itemTypes.PLAYER
+  }
+
+  const updatedMaze = moveItem(
+    maze,
+    currentPlayerIndex,
+    direction,
+    getPreviousItemType,
+    getNewItemType,
+  )
+
+  // Update the points if the player ate a dot and/or food.
+  const dotEaten = hasItemTypeDecreased(maze, updatedMaze, itemTypes.DOT)
+  if (dotEaten) {
+    updatedMaze.dotsEaten++
+    updatedMaze.game.points += updatedMaze.pointsPerDot
+  }
+  const foodEaten = hasItemTypeDecreased(maze, updatedMaze, itemTypes.FOOD)
+  if (foodEaten) updatedMaze.game.points += updatedMaze.pointsPerFood
+
+  return updatedMaze
+}
+
+function moveGhost(maze, currentGhostIndex, getDirection) {
+  const direction = getDirection(maze, currentGhostIndex)
+
+  const getPreviousItemType = () =>
+    maze.replacedItems[currentGhostIndex] || itemTypes.DOT
+  const getNewItemType = () => itemTypes.GHOST
+
+  const updatedMaze = moveItem(
+    maze,
+    currentGhostIndex,
+    direction,
+    getPreviousItemType,
+    getNewItemType,
+  )
 
   // Set the ghost's current direction as the previousDirection for the next move.
+  const oldGhostIndexes = getItemIndexes(maze.items, [itemTypes.GHOST])
+  const newGhostIndexes = getItemIndexes(updatedMaze.items, [itemTypes.GHOST])
+  //console.log({ oldGhostIndexes, newGhostIndexes })
+
+  //TODO De new index van de zojuist verplaatste ghost achterhalen...
+
+  const stront = newGhostIndexes.filter((el) => !oldGhostIndexes.includes(el))
+  //console.log(stront)
+
+  const newGhostIndex = stront[0] //TODO determine new ghost index
   updatedMaze.ghosts[newGhostIndex] = {
     previousDirection: direction,
   }
   delete updatedMaze.ghosts[currentGhostIndex]
+
+  //console.log(updatedMaze)
 
   return updatedMaze
 }
@@ -124,29 +142,28 @@ function getRandomGhostDirection(maze, currentGhostIndex) {
 
   // Pick a random direction
   let possibleDirections = []
-  // A ghost can not move outside the maze and not into a wall or another ghost.
-  const canMoveTo = (maze, index) => {
-    return (
-      index !== -1 &&
-      ![itemTypes.WALL, itemTypes.GHOST].includes(maze.items[index])
-    )
-  }
+
+  //TODO curry canMoveTo, because 2 of the 3 arguments are always the same...
 
   const upIndex = determineNewIndex(currentGhostIndex, maze, directions.UP)
-  if (canMoveTo(maze, upIndex)) possibleDirections.push(directions.UP)
+  if (canMoveTo(maze, itemTypes.GHOST, upIndex))
+    possibleDirections.push(directions.UP)
 
   const downIndex = determineNewIndex(currentGhostIndex, maze, directions.DOWN)
-  if (canMoveTo(maze, downIndex)) possibleDirections.push(directions.DOWN)
+  if (canMoveTo(maze, itemTypes.GHOST, downIndex))
+    possibleDirections.push(directions.DOWN)
 
   const leftIndex = determineNewIndex(currentGhostIndex, maze, directions.LEFT)
-  if (canMoveTo(maze, leftIndex)) possibleDirections.push(directions.LEFT)
+  if (canMoveTo(maze, itemTypes.GHOST, leftIndex))
+    possibleDirections.push(directions.LEFT)
 
   const rightIndex = determineNewIndex(
     currentGhostIndex,
     maze,
     directions.RIGHT,
   )
-  if (canMoveTo(maze, rightIndex)) possibleDirections.push(directions.RIGHT)
+  if (canMoveTo(maze, itemTypes.GHOST, rightIndex))
+    possibleDirections.push(directions.RIGHT)
 
   if (previousDirection) {
     let skipDirection = getOppositeDirection(previousDirection)
@@ -160,6 +177,15 @@ function getRandomGhostDirection(maze, currentGhostIndex) {
   const direction = getRandomFromArray(possibleDirections)
 
   return direction
+}
+
+function canMoveTo(maze, itemType, index) {
+  return (
+    // You can not exit the maze
+    index !== -1 &&
+    // You can not go through a wall and you can not go to a place where the same item type already is
+    ![itemTypes.WALL, itemType].includes(maze.items[index])
+  )
 }
 
 function addFoodIfNecessary(maze, addFood) {
@@ -314,4 +340,11 @@ function createCopy(maze) {
     ghosts: { ...maze.ghosts },
     replacedItems: { ...maze.replacedItems },
   }
+}
+
+function hasItemTypeDecreased(maze1, maze2, itemType) {
+  return (
+    maze1.items.filter((i) => i === itemType).length >
+    maze2.items.filter((i) => i === itemType).length
+  )
 }
