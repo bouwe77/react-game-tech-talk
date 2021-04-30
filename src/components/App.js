@@ -3,7 +3,7 @@ import Designer from './designer/Designer'
 import Game from './game/Game'
 
 export default function App() {
-  const [playGame, setPlayGame] = useState(false)
+  const [playGame, setPlayGame] = useState(true)
 
   return (
     <>
