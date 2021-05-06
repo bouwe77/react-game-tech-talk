@@ -12,7 +12,7 @@ const getMaze = createGetMaze()
 const updateMaze = createUpdateMaze()
 
 const initialState = {
-  getMaze: () => getMaze(1),
+  getMaze: () => getMaze(2),
   direction: directions.NONE,
   interval: 400,
 }
