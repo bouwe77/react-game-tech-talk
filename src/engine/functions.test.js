@@ -1,5 +1,6 @@
 import { createGetMaze } from './mazes'
 import { createUpdateMaze } from './functions'
+import { directions } from './constants'
 
 // Create the updateMaze function with default randomness.
 const updateMaze = createUpdateMaze()
@@ -396,6 +397,87 @@ test('A ghost should not eat food', () => {
   ])
 
   // The test ends here: It does not matter here whether the player wins or not.
+})
+
+test.only('A ghost should not eat food (2)', () => {
+  // Arrange
+  const getMazeTemplate = (level) => {
+    return {
+      items: [
+        'X',
+        'P',
+        'X',
+        'X',
+        'X',
+        '.',
+        '.',
+        'X',
+        'X',
+        '.',
+        '.',
+        'X',
+        'X',
+        '.',
+        '.',
+        'X',
+        'X',
+        '.',
+        '.',
+        'X',
+        'X',
+        '.',
+        '@',
+        'X',
+        'X',
+        'X',
+        'X',
+        'X',
+      ],
+      itemsPerRow: 4,
+      numberOfRows: 7,
+      dotsUntilFood: 3,
+      dotsEaten: 0,
+    }
+  }
+
+  // Create the initial maze.
+  const level = 0
+  const getMaze = createGetMaze(getMazeTemplate)
+  const maze = getMaze(level)
+
+  // When updating the ghost should only go up and down
+  function moveGhost(maze, currentGhostIndex) {
+    hiero
+    return 'none'
+  }
+
+  const updateMazeWithStuff = createUpdateMaze(moveGhost)
+
+  // Act (the player eats all dots below and then moves aside)
+  const directions = [
+    'down',
+    'right',
+    'down',
+    'down',
+    'down',
+    'left',
+    'down',
+    'up',
+    'up',
+    'up',
+    'up',
+    'up',
+  ]
+  let updatedMaze = maze
+  for (var direction of directions) {
+    updatedMaze = updateMazeWithStuff(updatedMaze, direction)
+  }
+
+  // Assert all dots are gone now, the player is back and the ghost is still there
+  console.log(updatedMaze.items)
+  expect(updatedMaze.items.filter((i) => i === '.').length).toEqual(0)
+  expect(updatedMaze.items.indexOf('P')).toEqual(1)
+  expect(updatedMaze.items.indexOf('@')).toEqual(22)
 })
 
 test('When two ghosts meet they each should go another way', () => {

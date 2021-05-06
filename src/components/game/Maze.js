@@ -10,14 +10,11 @@ export default function Maze({ maze }) {
     <svg width={width} height={height}>
       <rect width={width} height={height} fill="black" />
 
-      {maze.items.reduce((itemComponents, item, index) => {
+      {maze.items.map((item, index) => {
         const x = (index % maze.itemsPerRow) * itemSize
         const y = Math.floor(index / maze.itemsPerRow) * itemSize
-        return [
-          ...itemComponents,
-          <Item key={`${item}-${x}-${y}`} item={item} x={x} y={y} />,
-        ]
-      }, [])}
+        return <Item key={`${item}-${x}-${y}`} item={item} x={x} y={y} />
+      })}
     </svg>
   )
 }

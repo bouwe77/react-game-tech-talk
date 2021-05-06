@@ -75,9 +75,9 @@ function reducer(state, action) {
       return { ...state, mazes, selectedMaze, error, mazeItemsText }
     }
     case 'SELECT_MAZE': {
-      const selectedMaze = state.mazes.filter(
+      const selectedMaze = state.mazes.find(
         (m) => m.id === action.payload.mazeId,
-      )[0]
+      )
       const mazeItemsText = selectedMaze.items.reduce(
         (items, item, index) =>
           (items +=
