@@ -5,11 +5,16 @@ import Game from './game/Game'
 export default function App() {
   const [playGame, setPlayGame] = useState(true)
 
-  return (
-    <>
+  {
+    /*
       <div>
         <button onClick={() => setPlayGame(!playGame)}>toggle</button>
       </div>
+*/
+  }
+
+  return (
+    <>
       <div style={{ textAlign: 'center' }}>
         {playGame ? (
           <>
