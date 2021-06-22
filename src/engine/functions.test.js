@@ -410,15 +410,11 @@ test.only('A ghost should not eat food (2)', () => {
         'X',
         'X',
         '.',
-        '.',
         'X',
-        'X',
-        '.',
-        '.',
         'X',
         'X',
         '.',
-        '.',
+        'X',
         'X',
         'X',
         '.',
@@ -426,7 +422,11 @@ test.only('A ghost should not eat food (2)', () => {
         'X',
         'X',
         '.',
+        '.',
+        'X',
+        'X',
         '@',
+        'X',
         'X',
         'X',
         'X',
@@ -435,7 +435,7 @@ test.only('A ghost should not eat food (2)', () => {
       ],
       itemsPerRow: 4,
       numberOfRows: 7,
-      dotsUntilFood: 3,
+      dotsUntilFood: 5,
       dotsEaten: 0,
     }
   }
@@ -445,39 +445,81 @@ test.only('A ghost should not eat food (2)', () => {
   const getMaze = createGetMaze(getMazeTemplate)
   const maze = getMaze(level)
 
-  // When updating the ghost should only go up and down
-  function moveGhost(maze, currentGhostIndex) {
-    hiero
-    return 'none'
+  // When updating, the ghost should only go up and down.
+  function getMockedGhostDirection(maze, currentGhostIndex) {
+    currentGhostIndex = Number(currentGhostIndex)
+
+    // Do not move the ghost until the player is finished moving/eating.
+    if (maze.items.indexOf('P') !== 18) {
+      //console.log('player is not there yet')
+      return 'none'
+    }
+
+    // console.log('player is there, so move...')
+    // console.log({ currentGhostIndex })
+    //console.log(    maze.ghosts[currentGhostIndex].previousDirection)
+    if (currentGhostIndex === 21) {
+      console.log('returning up...')
+      return 'up'
+    }
+
+    if (currentGhostIndex === 1) {
+      console.log('returning down...')
+      return 'down'
+    }
+
+    console.log(
+      'just return previousDirection',
+      maze.ghosts[currentGhostIndex].previousDirection,
+    )
+    return maze.ghosts[currentGhostIndex].previousDirection
+
+    // verander de direction als je helemaal boven bent naar 'down'
+    // en als je helemaal onder bent naar up.
+    // daar tussenin de previousDirection pakken...
   }
 
-  const updateMazeWithStuff = createUpdateMaze(moveGhost)
+  const updateMazeWithStuff = createUpdateMaze(getMockedGhostDirection)
 
   // Act (the player eats all dots below and then moves aside)
-  const directions = [
-    'down',
-    'right',
-    'down',
-    'down',
-    'down',
-    'left',
-    'down',
-    'up',
-    'up',
-    'up',
-    'up',
-    'up',
-  ]
+  const directions = ['down', 'down', 'down', 'down', 'right']
   let updatedMaze = maze
   for (var direction of directions) {
     updatedMaze = updateMazeWithStuff(updatedMaze, direction)
+    //console.log(updatedMaze.items.indexOf('@'), updatedMaze.ghosts)
   }
 
-  // Assert all dots are gone now, the player is back and the ghost is still there
-  console.log(updatedMaze.items)
-  expect(updatedMaze.items.filter((i) => i === '.').length).toEqual(0)
-  expect(updatedMaze.items.indexOf('P')).toEqual(1)
-  expect(updatedMaze.items.indexOf('@')).toEqual(22)
+  // Assert some dots remain so the game is not over yet, the player moved aside and the ghost moved up
+  expect(updatedMaze.items.filter((i) => i === '.').length).toEqual(2)
+  expect(updatedMaze.items.indexOf('P')).toEqual(18)
+  expect(updatedMaze.items.indexOf('@')).toEqual(17)
+  console.log({ foodIndex: updatedMaze.items.indexOf('F') })
+  expect(updatedMaze.items.indexOf('F')).not.toEqual(-1)
+
+  // OK, everything is setup correctly now. Now the ghost will move up to the top and down to the bottom several times,
+  // so we can reproduce that it eats the food...
+
+  updatedMaze = updateMazeWithStuff(updatedMaze, 'none')
+  //console.log(updatedMaze.items.indexOf('@'))
+  updatedMaze = updateMazeWithStuff(updatedMaze, 'none')
+  //console.log(updatedMaze.items.indexOf('@'))
+  updatedMaze = updateMazeWithStuff(updatedMaze, 'none')
+  // console.log(updatedMaze.items.indexOf('@'))
+  updatedMaze = updateMazeWithStuff(updatedMaze, 'none')
+  
+   Door deze calls verdwijnt food inderdaad lijkt het,
+   maar dat wordt al opgemerkt daarboven ergens... WTF... :-@
+  
+  // console.log(updatedMaze.items.indexOf('@'))
+  // updatedMaze = updateMazeWithStuff(updatedMaze, 'none')
+  // console.log(updatedMaze.items.indexOf('@'))
+  // updatedMaze = updateMazeWithStuff(updatedMaze, 'none')
+  // console.log(updatedMaze.items.indexOf('@'))
+  // updatedMaze = updateMazeWithStuff(updatedMaze, 'none')
+  // console.log(updatedMaze.items.indexOf('@'))
+  // updatedMaze = updateMazeWithStuff(updatedMaze, 'none')
+  // console.log(updatedMaze.items.indexOf('@'))
+  //expect(updatedMaze.items.indexOf('@')).not.toEqual(21)
 })
 
 test('When two ghosts meet they each should go another way', () => {

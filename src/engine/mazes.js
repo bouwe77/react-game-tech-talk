@@ -1,4 +1,4 @@
-import { itemTypes } from './constants'
+import { directions, itemTypes } from './constants'
 import { getItemIndexes } from './functions'
 
 export function createGetMaze(getMaze = fetchMaze) {
@@ -12,7 +12,7 @@ export function createGetMaze(getMaze = fetchMaze) {
       ghosts = {
         ...ghosts,
         [ghostIndex]: {
-          previousDirection: null,
+          previousDirection: directions.NONE,
         },
       }
     }
@@ -80,23 +80,23 @@ export function fetchMaze(level) {
         'X',
         'X',
         '.',
-        '.',
         'X',
-        'X',
-        '.',
-        '.',
         'X',
         'X',
         '.',
-        '.',
         'X',
-        'X',
-        '.',
-        '.',
         'X',
         'X',
         '.',
+        'X',
+        'X',
+        'X',
+        '.',
+        '.',
+        'X',
+        'X',
         '@',
+        'X',
         'X',
         'X',
         'X',

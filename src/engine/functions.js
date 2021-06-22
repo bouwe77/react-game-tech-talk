@@ -28,7 +28,7 @@ function moveGhosts(maze, getDirection) {
 
   let updatedMaze = maze
 
-  for (let ghostIndex of Object.keys(maze.ghosts)) {
+  for (let ghostIndex of Object.keys(updatedMaze.ghosts)) {
     updatedMaze = moveGhost(updatedMaze, ghostIndex, getDirection)
   }
 
@@ -118,20 +118,22 @@ function moveGhost(maze, currentGhostIndex, getDirection) {
   // Set the ghost's current direction as the previousDirection for the next move.
   const oldGhostIndexes = getItemIndexes(maze.items, [itemTypes.GHOST])
   const newGhostIndexes = getItemIndexes(updatedMaze.items, [itemTypes.GHOST])
-  //console.log({ oldGhostIndexes, newGhostIndexes })
 
-  //TODO De new index van de zojuist verplaatste ghost achterhalen...
+  // If a ghost index changed, determine the new index by filtering out the old indexes so the new one remains.
+  const changedGhostIndex = newGhostIndexes.filter(
+    (el) => !oldGhostIndexes.includes(el),
+  )
+  let newGhostIndex
+  if (changedGhostIndex.length === 0) {
+    newGhostIndex = newGhostIndexes[0]
+  } else {
+    newGhostIndex = changedGhostIndex[0]
+  }
 
-  const stront = newGhostIndexes.filter((el) => !oldGhostIndexes.includes(el))
-  //console.log(stront)
-
-  const newGhostIndex = stront[0] //TODO determine new ghost index
+  delete updatedMaze.ghosts[currentGhostIndex]
   updatedMaze.ghosts[newGhostIndex] = {
     previousDirection: direction,
   }
-  delete updatedMaze.ghosts[currentGhostIndex]
-
-  //console.log(updatedMaze)
 
   return updatedMaze
 }
@@ -165,7 +167,7 @@ function getRandomGhostDirection(maze, currentGhostIndex) {
   if (canMoveTo(maze, itemTypes.GHOST, rightIndex))
     possibleDirections.push(directions.RIGHT)
 
-  if (previousDirection) {
+  if (previousDirection !== directions.NONE) {
     let skipDirection = getOppositeDirection(previousDirection)
 
     if (possibleDirections.length > 1)
@@ -312,7 +314,7 @@ function getPossibleGhostDirections(maze, index, previousDirection) {
   const rightIndex = determineNewIndex(index, maze, directions.RIGHT)
   if (canMoveTo(maze, rightIndex)) possibleDirections.push(directions.RIGHT)
 
-  if (previousDirection) {
+  if (previousDirection !== directions.NONE) {
     let skipDirection = getOppositeDirection(previousDirection)
 
     if (possibleDirections.length > 1)
